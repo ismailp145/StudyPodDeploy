@@ -16,12 +16,46 @@ interface Podcast {
   speed: number;
 }
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+let users: User[] = [
+  { id: 1, name: 'Alice', email: 'alice@example.com' },
+  { id: 2, name: 'Bob', email: 'bob@test.org' },
+  { id: 3, name: 'Charlie', email: 'charlie@something.net' },
+];
+
+app.get('/users', (req: Request, res: Response) => {
+  res.json(users);
+});
+
+app.post('/users', (req: Request, res: Response) => {
+  const newUser: User = {
+    id: Date.now(), // simplistic unique ID
+    name: req.body.name,
+    email: req.body.email,
+  };
+  users.push(newUser);
+  res.status(201).json(newUser);
+});
+
+app.delete('/users/:id', (req: Request, res: Response) => {
+  const userId = parseInt(req.params.id, 10);
+  users = users.filter((user) => user.id !== userId);
+  res.status(204).send();
+});
+
 // Hard coded data
 let podcasts: Podcast[] = [
   { id: 1, title: "Introduction to Physics", content: "Basic physics concepts", voiceStyle: "casual", speed: 1.0 },
   { id: 2, title: "Advanced Mathematics", content: "Complex mathematical theorems", voiceStyle: "formal", speed: 0.9 },
   { id: 3, title: "History Overview", content: "Major historical events", voiceStyle: "narrative", speed: 1.1 }
 ];
+
+
 
 // GET - Retrieve all podcasts
 app.get('/podcasts', (req: Request, res: Response): void => {
