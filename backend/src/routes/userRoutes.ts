@@ -1,9 +1,7 @@
 import express, { Request, Response, Router } from 'express';
 import {User} from '../types/User';
 
-
 const router: Router = express.Router();
-
 
 let users: User[] = [
   { id: 1, name: 'Alice', email: 'alice@example.com' },
@@ -11,11 +9,11 @@ let users: User[] = [
   { id: 3, name: 'Charlie', email: 'charlie@something.net' },
 ];
 
-router.get('/users', (req: Request, res: Response) => {
+router.get('/', (req: Request, res: Response) => {
   res.json(users);
 });
 
-router.post('/users', (req: Request, res: Response) => {
+router.post('/', (req: Request, res: Response) => {
   const newUser: User = {
     id: Date.now(), // simplistic unique ID
     name: req.body.name,
@@ -25,7 +23,7 @@ router.post('/users', (req: Request, res: Response) => {
   res.status(201).json(newUser);
 });
 
-router.delete('/users/:id', (req: Request, res: Response) => {
+router.delete('/:id', (req: Request, res: Response) => {
   const userId = parseInt(req.params.id, 10);
   users = users.filter((user) => user.id !== userId);
   res.status(204).send();
