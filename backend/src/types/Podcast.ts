@@ -1,7 +1,5 @@
-export interface Podcast {
+export interface PodcastSummary {
     id: number;
     title: string;
-    content: string;
-    voiceStyle: string;
-    speed: number;
+    textContent: string;
 }

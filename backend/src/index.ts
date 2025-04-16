@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
-import podcastRoutes from './routes/podcastRoutes';
+import podcastRoutes from './routes/podcastSummaryRoutes';
 
 const app: Express = express();
 const PORT = process.env.PORT || 5008;
