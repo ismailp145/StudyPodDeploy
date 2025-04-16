@@ -3,7 +3,6 @@ import { PodcastSummary } from '../types/Podcast';
 
 const router: Router = express.Router();
 
-// Hard coded data - you might want to move this to a separate file later
 let podcastSummaries: PodcastSummary[] = [
   { id: 1, title: "Introduction to Physics", textContent: "Basic physics concepts"},
   { id: 2, title: "Advanced Mathematics", textContent: "Complex mathematical theorems"},
