@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
-import podcastRoutes from './routes/podcastSummaryRoutes';
+import podcastSummaryRoutes from './routes/podcastSummaryRoutes';
 
 const app: Express = express();
 const PORT = process.env.PORT || 5008;
@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/podcasts', podcastRoutes);
+app.use('/podcast-summary', podcastSummaryRoutes);
 
 interface User {
   id: number;
