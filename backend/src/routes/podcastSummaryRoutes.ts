@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from 'express';
-import { PodcastSummary } from '../types/Podcast';
+import { PodcastSummary } from '../types/PodcastSummary';
 
 const router: Router = express.Router();
 
