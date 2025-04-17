@@ -1,5 +1,16 @@
 # StudyPod
 
+Project Pitch:
+Thousands of students struggle daily to balance their studies, manage time, and absorb vast amounts of information. Our AI-powered podcast generator transforms articles and study notes into personalized, natural-sounding podcasts, making learning effortless and flexible. Podcasts are the new hype and represent a rapidly growing media format that people are increasingly consuming in their daily lives. With this mobile app, students can effortlessly turn study time into productive, enjoyable listening anywhere, anytime - tapping into the proven effectiveness of audio learning through convenient smartphone access that seamlessly integrates with their on-the-go lifestyle.
+
+
+Front End:
+We will use React Native with Expo and TypeScript to build a responsive mobile app that users can interact with. NativeBase will provide the UI components for consistent design across iOS and Android platforms.
+
+
+Back End:
+We will use MongoDB to store user information and podcast content, and deploy a Node.js server with Express to handle data transfer between the front end and the database. Gemini AI will process and transform text content into podcast scripts, while ElevenLabs/Play.ht API will generate natural and unique voices for the audio content.
+
 
 Functional Requirements:
 User Features
