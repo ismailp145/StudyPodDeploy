@@ -16,3 +16,6 @@ discovery feed.
 Non Functional Requirements:
 1. Performance: The website should load in under 3 seconds for 95% of users,
 ensuring smooth navigation and score tracking even during peak usage times.
+2. Security: User data, including login credentials and review information, must be encrypted using AES-256 encryption, with secure authentication mechanisms to protect user privacy.
+3. Usability: The website should be mobile-friendly, with an intuitive interface that achieves a user satisfaction score of at least 80% in terms of ease of use and Navigation.
+4. Scalability: The platform must support up to 50 active concurrently without significant slowdowns or issues.
