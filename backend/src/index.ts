@@ -2,7 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import podcastSummaryRoutes from './routes/podcastSummaryRoutes';
 import userRoutes from './routes/userRoutes';
-
+import podcastAudioRoutes from './routes/podcastAudioRoutes';
 const app: Express = express();
 const PORT = process.env.PORT || 5008;
 
@@ -13,6 +13,7 @@ app.use(express.json());
 // Routes
 app.use('/podcast-summary', podcastSummaryRoutes);
 app.use('/users', userRoutes);
+app.use('/podcast-audio', podcastAudioRoutes);
 
 // Root test route
 app.get('/', (req: Request, res: Response): void => {
