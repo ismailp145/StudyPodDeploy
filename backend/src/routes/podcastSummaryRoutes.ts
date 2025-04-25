@@ -1,51 +1,62 @@
 import express, { Request, Response, Router } from 'express';
-import { PodcastSummary } from '../types/PodcastSummary';
+import { PrismaClient } from '../generated/prisma';
 
+const prisma = new PrismaClient();
 const router: Router = express.Router();
 
-let podcastSummaries: PodcastSummary[] = [
-  { id: 1, title: "Introduction to Physics", textContent: "Basic physics concepts"},
-  { id: 2, title: "Advanced Mathematics", textContent: "Complex mathematical theorems"},
-  { id: 3, title: "History Overview", textContent: "Major historical events"}
-];
-
 // GET - Retrieve all podcasts
-router.get('/', (req: Request, res: Response): void => {
-  res.json({ podcastSummaries });
+router.get('/', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const podcastSummaries = await prisma.podcastSummary.findMany();
+    res.json({ podcastSummaries });
+  } catch (error) {
+    console.error('Error fetching podcasts:', error);
+    res.status(500).json({ error: 'Failed to retrieve podcasts' });
+  }
 });
 
 // Create a new podcast
-router.post('/', (req: Request, res: Response): void => {
-  const { title, textContent } = req.body;
-  
-  if (!title || !textContent) {
-    res.status(400).json({ error: "Title and content are required" });
+router.post('/', async (req: Request, res: Response): Promise<void> => {
+  const { title, summary } = req.body;
+
+  if (!title || !summary) {
+    res.status(400).json({ error: 'Title and summary are required' });
     return;
   }
-  
-  const newPodcast: PodcastSummary = {
-    id: podcastSummaries.length + 1,
-    title,
-    textContent,
-  };
-  
-  podcastSummaries.push(newPodcast);
-  res.status(201).json({ podcastSummaries });
+
+  try {
+    const newPodcast = await prisma.podcastSummary.create({
+      data: {
+        title,
+        summary,
+      },
+    });
+
+    res.status(201).json({ podcastSummary: newPodcast });
+  } catch (error) {
+    console.error('Error creating podcast:', error);
+    res.status(500).json({ error: 'Failed to create podcast' });
+  }
 });
 
 // Remove a podcast by ID
-router.delete('/:id', (req: Request, res: Response): void => {
-  const id = parseInt(req.params.id);
-  const initialLength = podcastSummaries.length;
-  
-  podcastSummaries = podcastSummaries.filter(podcastSummary => podcastSummary.id !== id);
-  
-  if (podcastSummaries.length === initialLength) {
-    res.status(404).json({ error: "Podcast not found" });
-    return;
+router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
+  const id = req.params.id;
+
+  try {
+    const deletedPodcast = await prisma.podcastSummary.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    res.json({ message: 'Podcast deleted', deletedPodcast });
+  } catch (error) {
+    console.error('Error deleting podcast:', error);
+    res
+      .status(404)
+      .json({ error: 'Podcast not found or could not be deleted' });
   }
-  
-  res.json({ message: "Podcast deleted", podcastSummaries });
 });
 
 export default router;

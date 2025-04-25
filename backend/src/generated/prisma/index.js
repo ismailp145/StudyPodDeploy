@@ -139,7 +139,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../prisma",
   "clientVersion": "6.6.0",
@@ -148,12 +148,11 @@ const config = {
     "db"
   ],
   "activeProvider": "mongodb",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "value": "mongodb+srv://fakhan0623:Studypodisawesome6!@studypodcluster.owcy4u1.mongodb.net/studypod_db?retryWrites=true&w=majority&appName=StudyPodCluster"
       }
     }
   },

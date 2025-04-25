@@ -3,8 +3,11 @@ import cors from 'cors';
 import podcastSummaryRoutes from './routes/podcastSummaryRoutes';
 import userRoutes from './routes/userRoutes';
 import podcastAudioRoutes from './routes/podcastAudioRoutes';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 const app: Express = express();
-const PORT = process.env.PORT || 5008;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());
@@ -22,5 +25,5 @@ app.get('/', (req: Request, res: Response): void => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
