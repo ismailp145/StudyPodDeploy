@@ -16,18 +16,15 @@ We will use MongoDB to store user information and podcast content, and deploy a 
 
 ### User Features
 
-1. Users should be able to sign up, log in/out, and reset their password, with optional
-social login.
+1. Users should be able to sign up, log in/out, and reset their password, with optional social login.
 
-2. Users should be able to upload or import text content (articles, notes). It will convert
-any text content into audio podcast format alongside a summary.
+2. Users should be able to receive a podcast on any topic submitted.
 
-3. Users should be able to personalize audio settings (voice style, reading speed, etc.)
+3. Users should have access to recommended or trending content via a personalized discovery feed.
 
-4. Users can manage a custom playlist of generated podcasts that they have saved.
+4. Users can listen to and view previously created podcasts.
 
-5. Users should have access to recommended or trending content via a personalized
-discovery feed.
+5. Users should have a functional UI that includes media controls and allows for the podcast to be sped up, played in a different voice and vary in length.
 
 ### Non Functional Requirements
 
@@ -39,3 +36,11 @@ ensuring smooth navigation and score tracking even during peak usage times.
 3. Usability: The website should be mobile-friendly, with an intuitive interface that achieves a user satisfaction score of at least 80% in terms of ease of use and Navigation.
 
 4. Scalability: The platform must support up to 50 active concurrently without significant slowdowns or issues.
+
+### Sequence Diagram
+
+[Sequence Diagram](SeqDiagram.pdf)
+
+### Architecture Diagram
+
+[Archiecture Diagram](ArchDiagram.pdf)
