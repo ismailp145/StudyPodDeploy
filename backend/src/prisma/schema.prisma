@@ -19,3 +19,13 @@ model User {
   email    String @unique
   password String
 }
+
+model AudioFile {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  s3Key        String   // The unique key/path of the file in the S3 bucket (e.g., "uploads/audio-uuid.mp3")
+  originalName String?  // Optional: original name of the uploaded file (e.g., "example.mp3")
+  contentType  String   // MIME type of the file (e.g., "audio/mpeg")
+  url          String   // URL to access the file on S3 (public or signed URL)
+  uploadDate   DateTime @default(now()) // Timestamp of when the file was uploaded, defaults to current time
+}
+
