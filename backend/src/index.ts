@@ -3,7 +3,9 @@ import cors from 'cors';
 import podcastSummaryRoutes from './routes/podcastSummaryRoutes';
 import userRoutes from './routes/userRoutes';
 import podcastAudioRoutes from './routes/podcastAudioRoutes';
+import audioRoutes from './routes/audioRoutes';
 import * as dotenv from 'dotenv';
+
 dotenv.config();
 
 const app: Express = express();
@@ -16,7 +18,8 @@ app.use(express.json());
 // Routes
 app.use('/podcast-summary', podcastSummaryRoutes);
 app.use('/users', userRoutes);
-app.use('/podcast-audio', podcastAudioRoutes);
+// app.use('/podcast-audio', podcastAudioRoutes);
+app.use('/audio', audioRoutes);
 
 // Root test route
 app.get('/', (req: Request, res: Response): void => {
