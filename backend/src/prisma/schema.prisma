@@ -15,9 +15,10 @@ model PodcastSummary {
 }
 
 model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  email    String @unique
-  password String
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  email      String      @unique
+  password   String
+  audioFiles AudioFile[]
 }
 
 model AudioFile {
@@ -27,5 +28,7 @@ model AudioFile {
   contentType  String   // MIME type of the file (e.g., "audio/mpeg")
   url          String   // URL to access the file on S3 (public or signed URL)
   uploadDate   DateTime @default(now()) // Timestamp of when the file was uploaded, defaults to current time
+  userId       String   @db.ObjectId
+  user         User     @relation(fields: [userId], references: [id])
 }
 
