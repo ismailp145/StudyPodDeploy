@@ -5,6 +5,7 @@ export default () => {
     <Tabs>
         <Tabs.Screen name="home" options={{headerShown: false}}/>
         <Tabs.Screen name="search" options={{headerShown: false}}/>
+        <Tabs.Screen name="combined" options={{headerShown: false}}/>
     </Tabs>
     
   );

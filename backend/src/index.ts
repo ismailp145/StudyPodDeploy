@@ -4,7 +4,8 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import podcastAudioRoutes from './routes/podcastAudioRoutes';
-import ttsRoutes from './routes/TTSRoute';    // <— import the router you just exported
+import ttsRoutes from './routes/TTSRoute'; 
+import TTSandGemeniCombined from './routes/TTSandGemeniCombined';
 
 dotenv.config();
 
@@ -17,7 +18,8 @@ app.use(express.json());
 
 // Mount routers
 app.use('/podcast-audio', podcastAudioRoutes);
-app.use('/tts-server', ttsRoutes);          // <— mount the PlayHT router here
+app.use('/tts-server', ttsRoutes);
+app.use('/tts-gemini', TTSandGemeniCombined);
 
 // Root test route
 app.get('/', (req: Request, res: Response) => {
