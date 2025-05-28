@@ -1,5 +1,10 @@
 import { Stack } from "expo-router";
 
-export default function RootLayout() {
-  return <Stack />;
+const StackLayout = () => {
+  return (
+    <Stack>
+      <Stack.Screen name="(tabs)"/>
+    </Stack>
+
+  );
 }
