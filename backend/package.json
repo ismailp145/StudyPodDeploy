@@ -22,7 +22,8 @@
     "express": "^5.1.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.13.2",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "playht": "^0.21.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
