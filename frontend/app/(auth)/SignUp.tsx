@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
+import {auth} from '@/firebaseConfig';
 
 export default function SignUp() {
     const [name, setName] = useState('');
@@ -21,7 +22,23 @@ export default function SignUp() {
     };
 
     const validatePassword = (password: string) => {
-        return password.length >= 6;
+        // Check if password meets minimum length requirement
+        const isLengthValid = password.length >= 8;
+        
+        // Check if password contains at least one uppercase letter
+        const hasUpperCase = /[A-Z]/.test(password);
+        
+        // Check if password contains at least one lowercase letter
+        const hasLowerCase = /[a-z]/.test(password);
+        
+        // Check if password contains at least one number
+        const hasNumber = /[0-9]/.test(password);
+        
+        // Check if password contains at least one special character
+        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        
+        // Return true only if all criteria are met
+        return isLengthValid && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
     };
 
     const handleSignUp = async () => {
@@ -37,7 +54,7 @@ export default function SignUp() {
         }
 
         if (!validatePassword(password)) {
-            Alert.alert('Error', 'Password must be at least 6 characters long');
+            Alert.alert('Error', 'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
             return;
         }
 
@@ -47,7 +64,6 @@ export default function SignUp() {
         }
 
         setLoading(true);
-        const auth = getAuth();
         
         try {
             // Create user with email and password
@@ -62,7 +78,7 @@ export default function SignUp() {
             console.log("User registered:", user.email);
             
             // Navigate to the main app or onboarding
-            router.replace('/');
+            router.replace('/main');
         } catch (error: any) {
             const errorCode = error.code;
             const errorMessage = error.message;

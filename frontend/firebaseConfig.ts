@@ -1,18 +1,16 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import {getAuth} from "firebase/auth";
+// @ts-ignore
+import { initializeAuth, getReactNativePersistence, getAuth } from 'firebase/auth';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import * as dotenv from 'dotenv';
 
-dotenv.config();
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
+  apiKey: "AIzaSyCD_2MY3s3F2XliuvqzcGsiDzvqUYYArLA",
   authDomain: "study-pod-116bf.firebaseapp.com",
   projectId: "study-pod-116bf",
   storageBucket: "study-pod-116bf.firebasestorage.app",
@@ -26,8 +24,8 @@ export const app = initializeApp(firebaseConfig);
 
 
 // Initialize Firebase Authentication and get a reference to the service
-export const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+// export const auth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+// });
 
-// export const getauth = getAuth(app);
+export const auth = getAuth(app)

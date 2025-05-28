@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
-
+import {auth} from '@/firebaseConfig';
 export default function LogIn() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -19,8 +19,7 @@ export default function LogIn() {
         }
 
         setLoading(true);
-        const auth = getAuth();
-        
+         
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             // Signed in 
@@ -28,7 +27,7 @@ export default function LogIn() {
             console.log("Logged in user:", user.email);
             
             // Navigate to the main app
-            router.replace('/');
+            router.replace('/main');
         } catch (error: any) {
             const errorCode = error.code;
             const errorMessage = error.message;

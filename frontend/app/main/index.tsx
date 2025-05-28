@@ -8,10 +8,11 @@ export default function Index() {
         justifyContent: "center",
         alignItems: "center",
       }}
-    > 
+    >
     <Link href = "/(auth)">
-      <Text> Go to Authentication</Text>  
+      <Text>Welcome to the Main screen!</Text>
       </Link>
     </View>
   );
 }
+
