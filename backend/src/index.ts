@@ -1,25 +1,15 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
-import podcastSummaryRoutes from './routes/podcastSummaryRoutes';
-import userRoutes from './routes/userRoutes';
 import podcastAudioRoutes from './routes/podcastAudioRoutes';
-import audioRoutes from './routes/audioRoutes';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
-
 const app: Express = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5008;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/podcast-summary', podcastSummaryRoutes);
-app.use('/users', userRoutes);
-// app.use('/podcast-audio', podcastAudioRoutes);
-app.use('/audio', audioRoutes);
+app.use('/podcast-audio', podcastAudioRoutes);
 
 // Root test route
 app.get('/', (req: Request, res: Response): void => {
@@ -28,5 +18,5 @@ app.get('/', (req: Request, res: Response): void => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
