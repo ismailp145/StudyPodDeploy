@@ -23,7 +23,7 @@ model AudioFile {
   url           String                                       // Public or signed URL to the file
   uploadDate    DateTime            @default(now())          // Upload timestamp
   summary       PodcastSummary?     @relation("AudioToSummary") // 1:1 relation back to summary
-  playlistItems UserAudioFile[]                             // All users who have saved this audio
+  savedBy UserAudioFile[]                                    // All users who have saved this audio
 }
 
 model PodcastSummary {
