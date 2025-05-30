@@ -10,11 +10,11 @@ export default function AuthIndex() {
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.logoContainer}>
-                    <Image 
-                        source={require('../../assets/images/icon.png')} 
+                    {/* <Image 
+                        source={require('../../../assets/icon.png')} // Adjust the path to your logo image
                         style={styles.logo}
                         resizeMode="contain"
-                    />
+                    /> */}
                     <Text style={styles.title}>StudyPod</Text>
                     <Text style={styles.subtitle}>Learn together, grow together</Text>
                 </View>
