@@ -48,7 +48,7 @@ export default function AuthIndex() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#23272A', // Discord Not Quite Black
     },
     content: {
         flex: 1,
@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#333',
+        color: '#FFFFFF',
         marginBottom: 8,
     },
     subtitle: {
         fontSize: 16,
-        color: '#666',
+        color: '#B9BBBE', // Discord Grey
         textAlign: 'center',
     },
     buttonContainer: {
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     button: {
-        backgroundColor: '#4A6FFF',
+        backgroundColor: '#5865F2', // Discord Blurple
         borderRadius: 8,
         paddingVertical: 16,
         alignItems: 'center',
@@ -93,20 +93,20 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     secondaryButton: {
-        backgroundColor: 'transparent',
+        backgroundColor: '#2C2F33', // Discord Dark Not Black
         borderWidth: 1,
-        borderColor: '#4A6FFF',
+        borderColor: '#5865F2', // Discord Blurple
     },
     secondaryButtonText: {
-        color: '#4A6FFF',
+        color: '#FFFFFF',
     },
     termsText: {
         textAlign: 'center',
         fontSize: 12,
-        color: '#666',
+        color: '#B9BBBE', // Discord Grey
     },
     linkText: {
-        color: '#4A6FFF',
+        color: '#5865F2', // Discord Blurple
         fontWeight: '500',
     },
 });
