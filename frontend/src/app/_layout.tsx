@@ -1,16 +1,13 @@
 import { Stack } from "expo-router";
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useColorScheme } from '@/src/constants/useColorScheme';
+import { AuthProvider } from "../utils/authContext";
 
 export default function RootLayout() {
-const colorScheme = useColorScheme();
-  return(
-
-  <ThemeProvider value={colorScheme === 'light' ? DarkTheme : DefaultTheme}>
+  return (
+    <AuthProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>
-    </ThemeProvider>
-)
+      </AuthProvider> 
+  );
 }
 

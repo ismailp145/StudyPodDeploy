@@ -7,8 +7,8 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import SearchBar from '../../components/SearchBar';
-import TextToSpeech from '../../components/TextToSpeech';
+import SearchBar from '@/src/components/SearchBar';
+import TextToSpeech from '@/src/components/TextToSpeech';
 
 const List: React.FC = () => {
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);

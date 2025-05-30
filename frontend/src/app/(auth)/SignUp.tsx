@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
 import {auth} from '@/firebaseConfig';
+import { AuthContext } from '@/src/utils/authContext';
+import { useContext } from 'react';
 
 export default function SignUp() {
     const [name, setName] = useState('');
@@ -16,6 +18,7 @@ export default function SignUp() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const router = useRouter();
+    const authContext = useContext(AuthContext);
 
     const validateEmail = (email: string) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -81,7 +84,8 @@ export default function SignUp() {
             console.log("User registered:", user.email);
             
             // Navigate to the main app or onboarding
-            router.replace('/(tabs)/home');
+            authContext.logIn(); // Update auth context state
+            router.replace('/');
         } catch (error: any) {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -130,6 +134,7 @@ export default function SignUp() {
                             value={name}
                             onChangeText={setName}
                             autoCapitalize="words"
+                            placeholderTextColor={'#666'}
                         />
                     </View>
 
@@ -142,6 +147,7 @@ export default function SignUp() {
                             onChangeText={setEmail}
                             autoCapitalize="none"
                             keyboardType="email-address"
+                            placeholderTextColor={'#666'}
                         />
                     </View>
 
@@ -154,6 +160,7 @@ export default function SignUp() {
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!showPassword}
+                                placeholderTextColor={'#666'}
                             />
                             <TouchableOpacity 
                                 onPress={() => setShowPassword(!showPassword)}
@@ -180,6 +187,7 @@ export default function SignUp() {
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
                                 secureTextEntry={!showConfirmPassword}
+                                placeholderTextColor={'#666'}
                             />
                             <TouchableOpacity 
                                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}

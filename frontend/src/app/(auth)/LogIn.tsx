@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
 import {auth} from '@/firebaseConfig';
+import { AuthContext } from "@/src/utils/authContext";
+import { useContext } from "react";
 
 export default function LogIn() {
     const [email, setEmail] = useState('');
@@ -13,6 +15,7 @@ export default function LogIn() {
     const [showPassword, setShowPassword] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const router = useRouter();
+    const authContext = useContext(AuthContext);
 
     const handleLogin = async () => {
         setErrorMessage(''); // Clear any previous errors
@@ -31,7 +34,8 @@ export default function LogIn() {
             console.log("Logged in user:", user.email);
             
             // Navigate to the main app
-            router.replace('/(tabs)/home');
+            authContext.logIn(); // Update auth context state
+            router.replace('/');
         } catch (error: any) {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -79,6 +83,7 @@ export default function LogIn() {
                             onChangeText={setEmail}
                             autoCapitalize="none"
                             keyboardType="email-address"
+                            placeholderTextColor={'#666'}
                         />
                     </View>
 
@@ -91,6 +96,7 @@ export default function LogIn() {
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!showPassword}
+                                placeholderTextColor={'#666'}
                             />
                             <TouchableOpacity 
                                 onPress={() => setShowPassword(!showPassword)}
