@@ -27,7 +27,7 @@ export default function LogIn() {
             console.log("Logged in user:", user.email);
             
             // Navigate to the main app
-            router.replace('/main');
+            router.replace('/(tabs)/home');
         } catch (error: any) {
             const errorCode = error.code;
             const errorMessage = error.message;
