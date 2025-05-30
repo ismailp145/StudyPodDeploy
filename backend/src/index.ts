@@ -11,7 +11,7 @@ import audioStorageRoutes from './routes/audioStorageRoutes';
 dotenv.config();
 
 const app: Express = express();
-const PORT = process.env.PORT || 5008;
+const PORT = process.env.PORT || 8080;
 
 // Middleware
 app.use(cors());
