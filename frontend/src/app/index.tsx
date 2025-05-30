@@ -1,5 +1,7 @@
 import { Text, View,} from "react-native";
 import {Link} from "expo-router";
+import Auth from "./(auth)/index"
+
 export default function Index() {
   return (
     <View
@@ -9,9 +11,7 @@ export default function Index() {
         alignItems: "center",
       }}
     > 
-    <Link href = "/(auth)">
-      <Text> Go to Authentication</Text>  
-      </Link>
+    <Auth />
     </View>
   );
 }
