@@ -78,7 +78,7 @@ export default function SignUp() {
             console.log("User registered:", user.email);
             
             // Navigate to the main app or onboarding
-            router.replace('/main');
+            router.replace('/(tabs)/home');
         } catch (error: any) {
             const errorCode = error.code;
             const errorMessage = error.message;
