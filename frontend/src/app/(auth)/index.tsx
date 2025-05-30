@@ -10,11 +10,11 @@ export default function AuthIndex() {
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.logoContainer}>
-                    {/* <Image 
-                        source={require('../../../assets/icon.png')} // Adjust the path to your logo image
+                    <Image 
+                        source={require('@/assets/images/spod.png')} // Adjust the path to your logo image
                         style={styles.logo}
                         resizeMode="contain"
-                    /> */}
+                    />
                     <Text style={styles.title}>StudyPod</Text>
                     <Text style={styles.subtitle}>Learn together, grow together</Text>
                 </View>
@@ -61,9 +61,11 @@ const styles = StyleSheet.create({
         marginTop: 60,
     },
     logo: {
-        width: 100,
-        height: 100,
+        width: 200,
+        height: 200,
         marginBottom: 16,
+        borderRadius: 200, // Makes the image circular
+        overflow: 'hidden',
     },
     title: {
         fontSize: 32,
