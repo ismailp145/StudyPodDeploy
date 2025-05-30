@@ -13,15 +13,18 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.6.0",
     "aws-sdk": "^2.1692.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
+    "expo-av": "^15.1.4",
     "express": "^5.1.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.13.2",
-    "multer": "^2.0.0"
+    "multer": "^2.0.0",
+    "playht": "^0.21.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
