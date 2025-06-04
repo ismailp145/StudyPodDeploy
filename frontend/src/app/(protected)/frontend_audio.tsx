@@ -21,7 +21,7 @@ const List: React.FC = () => {
     try {
       // 1. Generate the text
       const genRes = await fetch(
-        `http://localhost:5008/podcast-audio/generate?prompt=${encodeURIComponent(
+        `http://localhost:8080/podcast-audio/generate?prompt=${encodeURIComponent(
           prompt
         )}`
       );
@@ -30,7 +30,7 @@ const List: React.FC = () => {
       setGeneratedContent(text);
 
       // 2. POST that text to your TTS endpoint
-      const ttsRes = await fetch('http://localhost:5008/tts-server', {
+      const ttsRes = await fetch('http://localhost:8080/tts-server', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),

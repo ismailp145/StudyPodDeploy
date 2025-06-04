@@ -18,7 +18,7 @@ const List: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5008/podcast-audio/generate?prompt=${encodeURIComponent(
+        `http://localhost:8080/podcast-audio/generate?prompt=${encodeURIComponent(
           prompt
         )}`
       );
