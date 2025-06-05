@@ -1,9 +1,11 @@
 import express, { Request, Response, Router } from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
+import { PrismaClient } from '../generated/prisma';
 
 dotenv.config();
 
+const prisma = new PrismaClient();
 const GEMINI_API_KEY = process.env.GOOGLE_API_KEY;
 
 if (!GEMINI_API_KEY) {
@@ -21,6 +23,7 @@ interface PodcastGenerationResponse {
   title: string;
   content: string;
   keywords: string[];
+  summary: string;
 }
 
 router.post('/', async (req: Request, res: Response): Promise<void> => {
@@ -69,7 +72,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
   try {
     const result = await geminiModel.generateContent([systemPrompt, prompt]);
-
     const response = result.response;
     const generatedText = response.text();
 
@@ -77,7 +79,24 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     const cleanedText = generatedText.replace(/^```json\s*|```$/g, '').trim();
     console.log('cleanedText', cleanedText);
     const parsedResponse = JSON.parse(cleanedText) as PodcastGenerationResponse;
-    res.json(parsedResponse);
+
+    // Save the generated content to the database
+    const savedSummary = await prisma.podcastSummary.create({
+      data: {
+        title: parsedResponse.title,
+        summary: parsedResponse.summary,
+        keywords: parsedResponse.keywords,
+        // Note: audioId will be set later when the audio file is generated
+      },
+    });
+
+    console.log('Saved podcast summary:', savedSummary);
+    
+    // Return both the generated content and the database record
+    res.json({
+      ...parsedResponse,
+      id: savedSummary.id
+    });
   } catch (error) {
     console.error('Generation error:', error);
     res.status(500).json({
