@@ -29,7 +29,8 @@ model AudioFile {
 model PodcastSummary {
   id        String       @id @default(auto()) @map("_id") @db.ObjectId
   title     String                                         // Summary title
-  summary   String                                         // Summary text
+  content   String                                         // The podcast audio script
+  summary   String                                         // The podcast summary
   keywords  String[]                                       // Keywords for lookup/matching
   audio     AudioFile?   @relation("AudioToSummary", fields: [audioId], references: [id])
   audioId   String?      @unique @db.ObjectId              // Unique 1:1 link to AudioFile
