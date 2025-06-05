@@ -2,9 +2,9 @@ import express, { Request, Response, Router } from 'express';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { PrismaClient } from '../generated/prisma';
+import { createAndSaveToS3AudioFile } from '../services/audioService';
 
 dotenv.config();
-
 const prisma = new PrismaClient();
 const GEMINI_API_KEY = process.env.GOOGLE_API_KEY;
 
@@ -27,7 +27,7 @@ interface PodcastGenerationResponse {
 }
 
 router.post('/', async (req: Request, res: Response): Promise<void> => {
-  const { prompt } = req.body;
+  const { prompt, userId } = req.body;
 
   if (!prompt) {
     res.status(400).json({ error: 'Prompt is required in request body' });
@@ -77,26 +77,46 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
     // Strip out code block markers like ```json or ```
     const cleanedText = generatedText.replace(/^```json\s*|```$/g, '').trim();
-    console.log('cleanedText', cleanedText);
     const parsedResponse = JSON.parse(cleanedText) as PodcastGenerationResponse;
 
-    // Save the generated content to the database
+    // Generate audio file and upload to S3
+    const audioResult = await createAndSaveToS3AudioFile(
+      parsedResponse.content,
+      `podcast_${Date.now()}`
+    );
+
+    // Save the podcast summary with audio reference
     const savedSummary = await prisma.podcastSummary.create({
       data: {
         title: parsedResponse.title,
+        content: parsedResponse.content,
         summary: parsedResponse.summary,
         keywords: parsedResponse.keywords,
-        // Note: audioId will be set later when the audio file is generated
+        audio: {
+            connect: {
+                id: audioResult.audioFileId
+            }
+        },
       },
+      include: {
+        audio: true
+      }
     });
 
-    console.log('Saved podcast summary:', savedSummary);
+    // If user is logged in, create a UserAudioFile entry
+    if (userId) {
+        await prisma.userAudioFile.create({
+          data: {
+            userId: userId,
+            audioId: audioResult.audioFileId
+          }
+        });
+      }
     
-    // Return both the generated content and the database record
-    res.json({
-      ...parsedResponse,
-      id: savedSummary.id
-    });
+      res.json({
+        ...parsedResponse,
+        id: savedSummary.id
+      });
   } catch (error) {
     console.error('Generation error:', error);
     res.status(500).json({

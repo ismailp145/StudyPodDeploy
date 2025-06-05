@@ -1,13 +1,8 @@
-// server.ts
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-
-import podcastDataGenerateRoutes from './routes/podcastDataGenerateRoutes';
-import ttsRoutes from './routes/TTSRoute'; 
+import podcastGenerateRoutes from './routes/podcastGenerateRoutes';
 import TTSandGemeniCombined from './routes/TTSandGemeniCombined';
-import audioStorageRoutes from './routes/audioStorageRoutes';
-
 dotenv.config();
 
 const app: Express = express();
@@ -18,10 +13,8 @@ app.use(cors());
 app.use(express.json());
 
 // Mount routers
-app.use('/podcast-generate-text', podcastDataGenerateRoutes);
-app.use('/tts-server', ttsRoutes);
+app.use('/podcast-generate', podcastGenerateRoutes);
 app.use('/tts-gemini', TTSandGemeniCombined);
-app.use('/audio-storage', audioStorageRoutes);
 
 // Root test route
 app.get('/', (req: Request, res: Response) => {
