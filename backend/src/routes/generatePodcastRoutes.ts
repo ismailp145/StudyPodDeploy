@@ -115,7 +115,9 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     
       res.json({
         ...parsedResponse,
-        id: savedSummary.id
+        id: savedSummary.id,
+        audioUrl: audioResult.s3Url,
+        s3Key:    audioResult.s3Key
       });
   } catch (error) {
     console.error('Generation error:', error);
