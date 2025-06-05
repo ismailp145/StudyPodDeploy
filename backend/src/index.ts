@@ -1,8 +1,9 @@
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import podcastGenerateRoutes from './routes/podcastGenerateRoutes';
+import podcastGenerateRoutes from './routes/generatePodcastRoutes';
 import TTSandGemeniCombined from './routes/TTSandGemeniCombined';
+import userRoutes from './routes/userRoutes';
 dotenv.config();
 
 const app: Express = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 // Mount routers
 app.use('/podcast-generate', podcastGenerateRoutes);
 app.use('/tts-gemini', TTSandGemeniCombined);
+app.use('/user', userRoutes);
 
 // Root test route
 app.get('/', (req: Request, res: Response) => {

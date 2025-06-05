@@ -1,60 +1,129 @@
 import express, { Request, Response, Router } from 'express';
-import {User} from '../types/User';
-import { PrismaClient } from '../generated/prisma';
+import { PrismaClient, Prisma } from '../generated/prisma';
 
 const router: Router = express.Router();
 const prisma = new PrismaClient();
 
+// Get all users (might want to add auth middleware)
 router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await prisma.user.findMany();
-    res.json({ user });
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        firebaseId: true,
+        playlistItems: {
+          include: {
+            audioFile: true
+          }
+        }
+      }
+    });
+    res.json({ users });
   } catch (error) {
-    console.error('Error fetching podcasts:', error);
-    res.status(500).json({ error: 'Failed to retrieve podcasts' });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Failed to retrieve users' });
   }
 });
 
-
+// Create or update user after Firebase authentication
 router.post('/', async (req: Request, res: Response): Promise<void> => {
-  const {email, password} = req.body;
+  const { firebaseId, email } = req.body;
 
-  if (!email || !password) {
-    res.status(400).json({ error: 'Email and password are Required' });
+  if (!firebaseId) {
+    res.status(400).json({ error: 'Firebase ID is required' });
     return;
   }
 
   try {
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        password
-      },
+    // Try to find existing user first
+    let user = await prisma.user.findUnique({
+      where: { firebaseId }
     });
 
-    res.status(201).json({ user: newUser });
+    if (user) {
+      // Update existing user if needed
+      user = await prisma.user.update({
+        where: { firebaseId },
+        data: { email },
+        include: {
+          playlistItems: {
+            include: {
+              audioFile: true
+            }
+          }
+        }
+      });
+    } else {
+      // Create new user
+      const userData: Prisma.UserUncheckedCreateInput = {
+        firebaseId,
+        email
+      };
+      
+      user = await prisma.user.create({
+        data: userData,
+        include: {
+          playlistItems: {
+            include: {
+              audioFile: true
+            }
+          }
+        }
+      });
+    }
+
+    res.status(201).json({ user });
   } catch (error) {
-    console.error('Error creating new user:', error);
-    res.status(500).json({ error: 'Failed to create user' });
+    console.error('Error creating/updating user:', error);
+    res.status(500).json({ error: 'Failed to create/update user' });
   }
 });
 
-router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
-  const id = req.params.id;
+// Get user by Firebase ID
+router.get('/:firebaseId', async (req: Request, res: Response): Promise<void> => {
+  const { firebaseId } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { firebaseId },
+      include: {
+        playlistItems: {
+          include: {
+            audioFile: true
+          }
+        }
+      }
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Failed to retrieve user' });
+  }
+});
+
+// Delete user
+router.delete('/:firebaseId', async (req: Request, res: Response): Promise<void> => {
+  const { firebaseId } = req.params;
 
   try {
     const deletedUser = await prisma.user.delete({
-      where: {
-        id: id,
-      },
+      where: { firebaseId },
+      include: {
+        playlistItems: true
+      }
     });
 
     res.json({ message: 'User deleted', deletedUser });
   } catch (error) {
-    console.error('Error deleting User:', error);
-    res
-      .status(404)
-      .json({ error: 'User not found or could not be deleted' });
+    console.error('Error deleting user:', error);
+    res.status(404).json({ error: 'User not found or could not be deleted' });
   }
 });
 
