@@ -13,24 +13,31 @@ const Home = () => {
   const handleGenerate = async () => {
     setLoading(true)
     try {
-      const response = await fetch(
-        'http://localhost:8080/generate-podcast',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt }),
-        }
-      )
+       const response = await fetch(
+      'http://localhost:8080/generate-podcast',   // 👈 replace with your dev-machine IP
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt }),
+      },
+    );
+      console.log('Response status:', response.status)
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        const errorText = await response.text()
+        console.error('Error response:', errorText)
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
       }
       const data = await response.json()
+      console.log('Response data:', data)
       setGeneratedContent(data.content)
       setPressed(true)
       setUrl(data.audioUrl)
       setTitle(data.title)
+      console.log('State after update:', {
+        content: data.content,
+        url: data.audioUrl,
+        title: data.title
+      })
     } catch (error) {
       console.error('Error generating content:', error)
       setGeneratedContent('Failed to generate content. Please try again.')

@@ -91,6 +91,7 @@ export const createAndSaveToS3AudioFile = async (text: string, filename?: string
      const { key, url } = await uploadLocalFileToS3(outputFilePath);
 
      // Save to database
+    // TODO: ISSUE IS RIGHT HERE
     const audioFile = await prisma.audioFile.create({
         data: {
           s3Key: key,

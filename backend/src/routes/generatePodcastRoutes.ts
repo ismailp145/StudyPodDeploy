@@ -27,7 +27,7 @@ interface PodcastGenerationResponse {
 }
 
 router.post('/', async (req: Request, res: Response): Promise<void> => {
-  const { prompt, userId } = req.body;
+  const { prompt } = req.body;
 
   if (!prompt) {
     res.status(400).json({ error: 'Prompt is required in request body' });
@@ -104,14 +104,14 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     });
 
     // If user is logged in, create a UserAudioFile entry
-    if (userId) {
+    // if (userId) {
         await prisma.userAudioFile.create({
           data: {
-            userId: userId,
+            userId: '98778234897239',
             audioId: audioResult.audioFileId
           }
         });
-      }
+      // }
     
       res.json({
         ...parsedResponse,
