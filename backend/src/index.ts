@@ -14,7 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 // Mount routers
-app.use('/podcast-generate', podcastGenerateRoutes);
+app.use('/generate-podcast', podcastGenerateRoutes);
 app.use('/tts-gemini', TTSandGemeniCombined);
 app.use('/user', userRoutes);
 
