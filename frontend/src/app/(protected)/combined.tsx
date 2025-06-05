@@ -17,7 +17,7 @@ const List: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5008/tts-gemini/generate?prompt=${encodeURIComponent(
+        `http://localhost:8080/tts-gemini/generate?prompt=${encodeURIComponent(
           prompt
         )}`
       );
