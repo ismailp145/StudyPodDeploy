@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useContext } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,7 +6,7 @@ import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
 import {auth} from '@/firebaseConfig';
 import { AuthContext } from '@/src/utils/authContext';
-import { useContext } from 'react';
+import axios from 'axios';
 
 export default function SignUp() {
     const [name, setName] = useState('');
@@ -72,14 +72,24 @@ export default function SignUp() {
         setLoading(true);
         
         try {
-            // Create user with email and password
+            // Create user with email and password in Firebase
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             
-            // Update profile with display name
+            // Update profile with display name in Firebase
             await updateProfile(user, {
                 displayName: name
             });
+
+            // Create user in our backend
+            try {
+                await axios.post(`http://localhost:8080/users`, {
+                    firebaseId: user.uid,
+                    email: user.email
+                });
+            } catch (backendError: any) {
+                console.error('Error creating user in backend:', backendError);
+            }
             
             console.log("User registered:", user.email);
             
