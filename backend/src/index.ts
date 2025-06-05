@@ -3,7 +3,7 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import podcastAudioRoutes from './routes/podcastAudioRoutes';
+import podcastDataGenerateRoutes from './routes/podcastDataGenerateRoutes';
 import ttsRoutes from './routes/TTSRoute'; 
 import TTSandGemeniCombined from './routes/TTSandGemeniCombined';
 import audioStorageRoutes from './routes/audioStorageRoutes';
@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 // Mount routers
-app.use('/podcast-audio', podcastAudioRoutes);
+app.use('/podcast-generate-text', podcastDataGenerateRoutes);
 app.use('/tts-server', ttsRoutes);
 app.use('/tts-gemini', TTSandGemeniCombined);
 app.use('/audio-storage', audioStorageRoutes);
@@ -30,5 +30,5 @@ app.get('/', (req: Request, res: Response) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });
