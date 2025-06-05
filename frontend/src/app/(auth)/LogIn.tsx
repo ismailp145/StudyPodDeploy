@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useContext } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -6,7 +6,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { Ionicons } from '@expo/vector-icons';
 import {auth} from '@/firebaseConfig';
 import { AuthContext } from "@/src/utils/authContext";
-import { useContext } from "react";
+import axios from 'axios';
 
 export default function LogIn() {
     const [email, setEmail] = useState('');
@@ -31,6 +31,18 @@ export default function LogIn() {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             // Signed in 
             const user = userCredential.user;
+            
+            // Ensure user exists in our backend
+            try {
+                await axios.post('http://localhost:8080/users', {
+                    firebaseId: user.uid,
+                    email: user.email
+                });
+            } catch (backendError: any) {
+                console.error('Error syncing user with backend:', backendError);
+                // Continue with login even if backend sync fails
+            }
+            
             console.log("Logged in user:", user.email);
             
             // Navigate to the main app
