@@ -11,6 +11,6 @@
       "types": ["node"],
       "moduleResolution": "node"
     },
-    "include": ["**/*"],
+    "include": ["**/*", "generated/**/*"],
     "exclude": ["node_modules", "dist"]
   }
