@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
-import { uploadLocalFileToS3 } from '../services/s3Service';
+import { uploadLocalFileToS3 } from './s3Service';
 import { PrismaClient } from '../generated/prisma';
 
 interface TTSResult {
