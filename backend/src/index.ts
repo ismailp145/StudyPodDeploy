@@ -1,8 +1,12 @@
+// server.ts
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+
 import podcastGenerateRoutes from './routes/generatePodcastRoutes';
 import userRoutes from './routes/userRoutes';
+import getFromMongoRoutes from './routes/getFromMongo';
+
 dotenv.config();
 
 const app: Express = express();
@@ -12,12 +16,20 @@ const PORT = process.env.PORT || 8080;
 app.use(cors());
 app.use(express.json());
 
-// Mount routers
+// Mount your existing routers
 app.use('/generate-podcast', podcastGenerateRoutes);
 app.use('/user', userRoutes);
 
-// Root test route
-app.get('/', (req: Request, res: Response) => {
+// Mount the new “get from Mongo” routes
+// GET /mongo/users
+// GET /mongo/audio-files
+// GET /mongo/podcast-summaries
+// GET /mongo/user-audio-files
+// GET /mongo/audio-file-keywords
+app.use('/mongo', getFromMongoRoutes);
+
+// Root health‐check
+app.get('/', (_req: Request, res: Response) => {
   res.send('StudyPod API is running - Convert your study materials to podcasts!');
 });
 
