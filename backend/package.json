@@ -28,10 +28,12 @@
     "playht": "^0.21.0"
   },
   "devDependencies": {
+    "@types/aws-sdk": "^2.7.4",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.1",
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.3",
     "@types/mongoose": "^5.11.97",
-    "@types/node": "^22.15.29",
+    "@types/node": "^22.15.30",
     "@types/node-fetch": "^2.6.12",
     "@types/uuid": "^10.0.0",
     "nodemon": "^3.1.9",
