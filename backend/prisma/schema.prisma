@@ -12,6 +12,7 @@ model User {
   id            String          @id @default(auto()) @map("_id") @db.ObjectId
   firebaseId    String          @unique // Firebase UID
   email         String? // Optional email
+  interests     String[]        @default([]) // Array of user interests
   playlistItems UserAudioFile[] // Audio saved to user's playlist
 }
 

@@ -7,13 +7,13 @@ SplashScreen.preventAutoHideAsync();
 
 type StoredAuth = {
   isLoggedIn: boolean;
-  userId: string | null;
+  firebaseId: string | null;
 };
 
 type AuthState = {
   isReady: boolean;
   isLoggedIn: boolean;
-  userId: string | null;
+  firebaseId: string | null;
   logIn: (uid: string) => void;
   logOut: () => void;
 };
@@ -23,7 +23,7 @@ const authStorageKey = 'auth-key';
 export const AuthContext = createContext<AuthState>({
   isReady: false,
   isLoggedIn: false,
-  userId: null,
+  firebaseId: null,
   logIn: () => {},
   logOut: () => {},
 });
@@ -31,7 +31,7 @@ export const AuthContext = createContext<AuthState>({
 export function AuthProvider({ children }: PropsWithChildren<{}>) {
   const [isReady, setIsReady] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [firebaseId, setFirebaseId] = useState<string | null>(null);
   const router = useRouter();
 
   const storeAuthState = async (newState: StoredAuth) => {
@@ -44,15 +44,15 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
 
   const logIn = (uid: string) => {
     setIsLoggedIn(true);
-    setUserId(uid);
-    storeAuthState({ isLoggedIn: true, userId: uid });
+    setFirebaseId(uid);
+    storeAuthState({ isLoggedIn: true, firebaseId: uid });
     router.replace('/');
   };
 
   const logOut = () => {
     setIsLoggedIn(false);
-    setUserId(null);
-    storeAuthState({ isLoggedIn: false, userId: null });
+    setFirebaseId(null);
+    storeAuthState({ isLoggedIn: false, firebaseId: null });
     router.replace('/(auth)/Home');
   };
 
@@ -62,9 +62,9 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
       try {
         const raw = await AsyncStorage.getItem(authStorageKey);
         if (raw) {
-          const { isLoggedIn, userId } = JSON.parse(raw) as StoredAuth;
+          const { isLoggedIn, firebaseId } = JSON.parse(raw) as StoredAuth;
           setIsLoggedIn(isLoggedIn);
-          setUserId(userId);
+          setFirebaseId(firebaseId);
         }
       } catch (error) {
         console.log('Error restoring auth state', error);
@@ -79,7 +79,7 @@ export function AuthProvider({ children }: PropsWithChildren<{}>) {
   }, [isReady]);
 
   return (
-    <AuthContext.Provider value={{ isReady, isLoggedIn, userId, logIn, logOut }}>
+    <AuthContext.Provider value={{ isReady, isLoggedIn, firebaseId, logIn, logOut }}>
       {children}
     </AuthContext.Provider>
   );

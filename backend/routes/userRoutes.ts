@@ -148,4 +148,45 @@ router.delete('/:firebaseId', async (req: Request, res: Response): Promise<void>
   }
 });
 
+// Save user interests
+router.post('/interests/:firebaseId', async (req: Request, res: Response): Promise<void> => {
+  const { firebaseId } = req.params;
+  const { interests } = req.body;
+
+  if (!interests || !Array.isArray(interests)) {
+    res.status(400).json({ error: 'Interests must be an array' });
+    return;
+  }
+
+  try {
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { firebaseId }
+    });
+
+    if (!existingUser) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    // Update user interests
+    const user = await prisma.user.update({
+      where: { firebaseId },
+      data: { interests },
+      include: {
+        playlistItems: {
+          include: {
+            audioFile: true
+          }
+        }
+      }
+    });
+
+    res.json({ user });
+  } catch (error) {
+    console.error('Error updating user interests:', error);
+    res.status(500).json({ error: 'Failed to update user interests' });
+  }
+});
+
 export default router;

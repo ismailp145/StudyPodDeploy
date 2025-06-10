@@ -60,6 +60,8 @@ export default function SignUp() {
 
       // Store UID & navigate
       logIn(user.uid);
+      // Navigate to info view after signup
+      router.replace('/interests');
     } catch (error: any) {
       let msg = 'Failed to create account. Please try again.';
       if (error.code === 'auth/email-already-in-use')
