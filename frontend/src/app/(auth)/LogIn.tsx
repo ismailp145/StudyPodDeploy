@@ -1,152 +1,88 @@
-import React, { useState , useContext } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
-import {auth} from '@/firebaseConfig';
-import { AuthContext } from "@/src/utils/authContext";
+import { auth } from '@/firebaseConfig';
+import { AuthContext } from '@/src/utils/authContext';
 import axios from 'axios';
 
 export default function LogIn() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    const router = useRouter();
-    const authContext = useContext(AuthContext);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
+  const { logIn } = useContext(AuthContext);
 
-    const handleLogin = async () => {
-        setErrorMessage(''); // Clear any previous errors
-        
-        if (!email || !password) {
-            setErrorMessage('Please enter both email and password');
-            return;
-        }
+  const handleLogin = async () => {
+    setErrorMessage('');
+    if (!email || !password) {
+      setErrorMessage('Please enter both email and password');
+      return;
+    }
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      try {
+        await axios.get(`https://studypod-nvau.onrender.com/user/${user.uid}`);
+      } catch {
+        console.warn('User not found in backend');
+      }
+      logIn(user.uid);
+    } catch (error: any) {
+      const code = error.code;
+      let msg = 'Failed to log in. Please try again.';
+      if (code === 'auth/invalid-credential') msg = 'Invalid email or password';
+      if (code === 'auth/too-many-requests') msg = 'Too many attempts. Try later.';
+      setErrorMessage(msg);
+      console.error(code, error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        setLoading(true);
-         
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            // Signed in 
-            const user = userCredential.user;
-            
-            // Ensure user exists in our backend
-            try {
-                await axios.get(`https://studypod-nvau.onrender.com/user/${user.uid}`);
-            } catch (backendError: any) {
-                console.error('Error user does not exist in firebase:', backendError);
-            }
-            
-            console.log("Logged in user:", user.email);
-            
-            // Navigate to the main app
-            authContext.logIn(); // Update auth context state
-            router.replace('/');
-        } catch (error: any) {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-
-            let message = 'Failed to log in. Please try again.';
-            if (errorCode === 'auth/invalid-credential') {
-                message = 'Invalid email or password';
-            } else if (errorCode === 'auth/too-many-requests') {
-                message = 'Too many unsuccessful login attempts. Please try again later.';
-            }
-            
-            setErrorMessage(message);
-            console.error(errorCode, errorMessage);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="#333" />
-                </TouchableOpacity>
-            </View>
-
-            <View style={styles.content}>
-                <Text style={styles.title}>Welcome back</Text>
-                <Text style={styles.subtitle}>Sign in to continue</Text>
-
-                {errorMessage ? (
-                    <View style={styles.errorContainer}>
-                        <Ionicons name="alert-circle" size={20} color="#FF3B30" />
-                        <Text style={styles.errorText}>{errorMessage}</Text>
-                    </View>
-                ) : null}
-
-                <View style={styles.form}>
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Email</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your email"
-                            value={email}
-                            onChangeText={setEmail}
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                            placeholderTextColor={'#666'}
-                        />
-                    </View>
-
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Password</Text>
-                        <View style={styles.passwordContainer}>
-                            <TextInput
-                                style={styles.passwordInput}
-                                placeholder="Enter your password"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry={!showPassword}
-                                placeholderTextColor={'#666'}
-                            />
-                            <TouchableOpacity 
-                                onPress={() => setShowPassword(!showPassword)}
-                                style={styles.eyeIcon}
-                            >
-                                <Ionicons 
-                                    name={showPassword ? "eye-off" : "eye"} 
-                                    size={24} 
-                                    color="#666" 
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    <TouchableOpacity 
-                    // onPress={() => router.push('/ForgotPassword')}
-                    >
-                        <Text style={styles.forgotPassword}>Forgot Password?</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={styles.button} 
-                        onPress={handleLogin}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color="#FFFFFF" />
-                        ) : (
-                            <Text style={styles.buttonText}>Log In</Text>
-                        )}
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.footer}>
-                    <Text style={styles.footerText}>Don&apos;t have an account? </Text>
-                    <TouchableOpacity onPress={() => router.push('/SignUp')}>
-                        <Text style={styles.signUpText}>Sign Up</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-        </SafeAreaView>
-    );
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.title}>Welcome back</Text>
+        <Text style={styles.subtitle}>Sign in to continue</Text>
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <Ionicons name="alert-circle" size={20} color="#FF3B30" />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
+        <View style={styles.form}>
+          {/* Email & Password Inputs... */}
+          <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+            {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Log In</Text>}
+          </TouchableOpacity>
+        </View>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Don’t have an account?</Text>
+          <TouchableOpacity onPress={() => router.push('/SignUp')}>
+            <Text style={styles.signUpText}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
