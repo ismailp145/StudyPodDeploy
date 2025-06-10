@@ -53,72 +53,53 @@ const STATIC_PODCASTS = [
 // Initialize static podcasts
 router.post('/initialize', async (req: Request, res: Response): Promise<void> => {
   try {
-    // First, get all existing static podcasts by their titles
-    const existingStaticPodcasts = await prisma.podcastSummary.findMany({
-      where: {
-        title: {
-          in: STATIC_PODCASTS.map(p => p.title)
+    for (const podcast of STATIC_PODCASTS) {
+      const s3Key = `initialize/${podcast.audioUrl.split('/').pop()}` || '';
+
+      // Check if a podcast with this s3Key already exists
+      const existingAudioFile = await prisma.audioFile.findFirst({
+        where: {
+          s3Key: s3Key
         }
-      },
-      include: {
-        audio: true
+      });
+
+      if (!existingAudioFile) {
+        // Create AudioFile entry if it doesn't exist
+        const audioFile = await prisma.audioFile.create({
+          data: {
+            s3Key: s3Key,
+            contentType: 'audio/mpeg',
+            url: podcast.audioUrl,
+            originalName: `${podcast.title.toLowerCase().replace(/\s+/g, '-')}.mp3`,
+          }
+        });
+
+        // Create PodcastSummary entry
+        await prisma.podcastSummary.create({
+          data: {
+            title: podcast.title,
+            content: podcast.content,
+            summary: podcast.summary,
+            keywords: podcast.keywords,
+            audioId: audioFile.id
+          }
+        });
       }
-    });
-
-    const existingTitles = new Set(existingStaticPodcasts.map(p => p.title));
-
-    // Create only the podcasts that don't exist yet
-    const newPodcasts = STATIC_PODCASTS.filter(podcast => !existingTitles.has(podcast.title));
-    
-    for (const podcast of newPodcasts) {
-      // Create AudioFile entry
-      const audioFile = await prisma.audioFile.create({
-        data: {
-          s3Key: `initialize/${podcast.audioUrl.split('/').pop()}` || '',
-          contentType: 'audio/mpeg',
-          url: podcast.audioUrl,
-          originalName: `${podcast.title.toLowerCase().replace(/\s+/g, '-')}.mp3`,
-        }
-      });
-
-      // Create PodcastSummary entry
-      await prisma.podcastSummary.create({
-        data: {
-          title: podcast.title,
-          content: podcast.content,
-          summary: podcast.summary,
-          keywords: podcast.keywords,
-          audioId: audioFile.id
-        }
-      });
     }
 
-    // Return all static podcasts (both existing and newly created)
+    // Return all static podcasts that have been initialized (based on s3Key prefix)
     const allStaticPodcasts = await prisma.podcastSummary.findMany({
       where: {
-        AND: [
-          {
-            title: {
-              in: STATIC_PODCASTS.map(p => p.title)
-            }
-          },
-          {
-            // Only get podcasts that were created from initialization
-            audio: {
-              s3Key: {
-                startsWith: 'initialize/'
-              }
-            }
+        audio: {
+          s3Key: {
+            startsWith: 'initialize/'
           }
-        ]
+        }
       },
       include: {
         audio: true
       }
     });
-
-    // Log the results for debugging
-    console.log('Found static podcasts:', allStaticPodcasts.map(p => ({ id: p.id, title: p.title })));
 
     res.status(200).json(allStaticPodcasts);
   } catch (error) {

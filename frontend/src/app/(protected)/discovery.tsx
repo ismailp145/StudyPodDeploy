@@ -14,7 +14,8 @@ interface PodcastData {
   };
 }
 
-const API_BASE_URL = 'https://studypod-nvau.onrender.com';
+const API_BASE_URL = 'http://localhost:10000';
+// const API_BASE_URL = 'https://studypod-nvau.onrender.com';
 
 const Discovery = () => {
   const [podcasts, setPodcasts] = useState<PodcastData[]>([]);
@@ -35,12 +36,7 @@ const Discovery = () => {
     try {
       setError(null);
       const { data } = await axios.post<PodcastData[]>(`${API_BASE_URL}/podcasts/initialize`);
-      console.log('Received podcasts:', data);
-      const uniquePodcasts = Array.from(
-        new Map(data.map(podcast => [podcast.title, podcast])).values()
-      );
-      console.log('Unique podcasts:', uniquePodcasts);
-      setPodcasts(uniquePodcasts);
+      setPodcasts(data);
     } catch (error) {
       console.error('Error fetching podcasts:', error);
       setError('Failed to load podcasts. Please try again.');

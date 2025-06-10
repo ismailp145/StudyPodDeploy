@@ -19,7 +19,7 @@ model User {
 
 model AudioFile {
   id               String             @id @default(auto()) @map("_id") @db.ObjectId
-  s3Key            String // S3 object key (e.g., uploads/audio-uuid.mp3)
+  s3Key            String @unique // S3 object key (e.g., uploads/audio-uuid.mp3)
   originalName     String? // Optional: original file name
   contentType      String // MIME type (e.g., audio/mpeg)
   url              String // Public or signed URL to the file
