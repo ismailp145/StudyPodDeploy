@@ -1,60 +1,51 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import Podcast from '@/src/components/Podcast';
+import { useRouter } from 'expo-router';
 
-interface PodcastSummary {
+interface PodcastData {
   id: string;
   title: string;
   summary: string;
-  keywords: string[];
   audio: {
     url: string;
   };
 }
 
 const Discovery = () => {
-  const [podcasts, setPodcasts] = useState<PodcastSummary[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [podcasts, setPodcasts] = useState<PodcastData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
+
+  const fetchPodcasts = async () => {
+    try {
+      const response = await fetch('https://studypod-nvau.onrender.com/podcasts');
+      if (!response.ok) {
+        throw new Error('Failed to fetch podcasts');
+      }
+      const data = await response.json();
+      setPodcasts(data);
+    } catch (error) {
+      console.error('Error fetching podcasts:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     fetchPodcasts();
   }, []);
 
-  const fetchPodcasts = async () => {
-    try {
-      const response = await axios.get('/api/podcasts/recommended');
-      setPodcasts(response.data);
-    } catch (error) {
-      console.error('Error fetching podcasts:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchPodcasts();
   };
 
-  const renderPodcastItem = ({ item }: { item: PodcastSummary }) => (
-    <TouchableOpacity style={styles.podcastCard}>
-      <View style={styles.podcastHeader}>
-        <MaterialIcons name="headset" size={24} color="#5865F2" />
-        <Text style={styles.podcastTitle}>{item.title}</Text>
-      </View>
-      <Text style={styles.podcastSummary} numberOfLines={2}>
-        {item.summary}
-      </Text>
-      <View style={styles.keywordsContainer}>
-        {item.keywords.slice(0, 3).map((keyword, index) => (
-          <View key={index} style={styles.keywordTag}>
-            <Text style={styles.keywordText}>{keyword}</Text>
-          </View>
-        ))}
-      </View>
-    </TouchableOpacity>
-  );
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <View style={[styles.container, styles.centered]}>
+      <View style={styles.centered}>
         <ActivityIndicator size="large" color="#5865F2" />
       </View>
     );
@@ -63,22 +54,40 @@ const Discovery = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Discover</Text>
-        <Text style={styles.subtitle}>Content tailored to your interests</Text>
+        <Text style={styles.title}>Discover Podcasts</Text>
+        <Text style={styles.subtitle}>Explore our curated collection of educational podcasts</Text>
       </View>
 
       <FlatList
         data={podcasts}
-        renderItem={renderPodcastItem}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContainer}
-        showsVerticalScrollIndicator={false}
+        renderItem={({ item }) => (
+          <Podcast
+            id={item.id}
+            title={item.title}
+            summary={item.summary}
+            audioUrl={item.audio.url}
+          />
+        )}
+        keyExtractor={item => item.id}
+        numColumns={2}
+        contentContainerStyle={styles.grid}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#5865F2']}
+            tintColor="#5865F2"
+          />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>No podcasts available</Text>
+          </View>
+        }
       />
     </View>
   );
 };
-
-export default Discovery;
 
 const styles = StyleSheet.create({
   container: {
@@ -86,8 +95,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#23272A',
   },
   centered: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: '#23272A',
   },
   header: {
     padding: 20,
@@ -102,47 +113,22 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#B9BBBE',
+    marginBottom: 20,
   },
-  listContainer: {
+  grid: {
+    padding: 8,
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
-  podcastCard: {
-    backgroundColor: '#2C2F33',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  podcastHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  podcastTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
-    marginLeft: 12,
-    flex: 1,
-  },
-  podcastSummary: {
-    fontSize: 14,
+  emptyStateText: {
+    fontSize: 16,
     color: '#B9BBBE',
-    marginBottom: 12,
-    lineHeight: 20,
+    textAlign: 'center',
   },
-  keywordsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  keywordTag: {
-    backgroundColor: '#40444B',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-  },
-  keywordText: {
-    fontSize: 12,
-    color: '#FFFFFF',
-  }
-}); 
+});
+
+export default Discovery; 

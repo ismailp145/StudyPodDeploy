@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import podcastGenerateRoutes from './routes/generatePodcastRoutes';
 import userRoutes from './routes/userRoutes';
 import getFromMongoRoutes from './routes/getFromMongo';
+import podcastRoutes from './routes/podcasts';
 
 dotenv.config();
 
@@ -19,8 +20,9 @@ app.use(express.json());
 // Mount your existing routers
 app.use('/generate-podcast', podcastGenerateRoutes);
 app.use('/user', userRoutes);
+app.use('/podcasts', podcastRoutes);
 
-// Mount the new “get from Mongo” routes
+// Mount the new "get from Mongo" routes
 // GET /mongo/users
 // GET /mongo/audio-files
 // GET /mongo/podcast-summaries
