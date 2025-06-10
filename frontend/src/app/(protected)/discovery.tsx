@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import Podcast from '@/src/components/Podcast';
 import { useRouter } from 'expo-router';
+import axios from 'axios';
+import { AuthContext } from '@/src/utils/authContext';
 
 interface PodcastData {
   id: string;
@@ -12,22 +14,31 @@ interface PodcastData {
   };
 }
 
+const API_BASE_URL = 'https://studypod-nvau.onrender.com';
+
 const Discovery = () => {
   const [podcasts, setPodcasts] = useState<PodcastData[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { firebaseId } = React.useContext(AuthContext);
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!firebaseId) {
+      router.replace('/(auth)/Home');
+    }
+  }, [firebaseId]);
 
   const fetchPodcasts = async () => {
     try {
-      const response = await fetch('https://studypod-nvau.onrender.com/podcasts');
-      if (!response.ok) {
-        throw new Error('Failed to fetch podcasts');
-      }
-      const data = await response.json();
+      setError(null);
+      const { data } = await axios.get<PodcastData[]>(`${API_BASE_URL}/podcasts`);
       setPodcasts(data);
     } catch (error) {
       console.error('Error fetching podcasts:', error);
+      setError('Failed to load podcasts. Please try again.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -35,18 +46,38 @@ const Discovery = () => {
   };
 
   useEffect(() => {
-    fetchPodcasts();
-  }, []);
+    if (firebaseId) {
+      fetchPodcasts();
+    }
+  }, [firebaseId]);
 
   const onRefresh = () => {
     setRefreshing(true);
     fetchPodcasts();
   };
 
+  if (!firebaseId) {
+    return null; // Don't render anything while redirecting
+  }
+
   if (loading) {
     return (
       <View style={styles.centered}>
         <ActivityIndicator size="large" color="#5865F2" />
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity 
+          style={styles.retryButton}
+          onPress={fetchPodcasts}
+        >
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -99,6 +130,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#23272A',
+    padding: 20,
   },
   header: {
     padding: 20,
@@ -128,6 +160,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#B9BBBE',
     textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#ED4245',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#5865F2',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
