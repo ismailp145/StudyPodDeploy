@@ -46,7 +46,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     - Use a conversational tone with natural transitions
     - Include specific examples and practical insights where relevant
     - NO opening greetings or closing remarks - dive straight into content
-    - IMPORTANT: The podcast text should be about 100 words or less 
+    - IMPORTANT: The podcast text should be about 50 words or less 
     - IMPORTANT: Return response as valid JSON only
     - IMPORTANT: Do NOT include any markdown formatting such as triple backticks or code blocks in your response.
 

@@ -11,6 +11,9 @@ const Home = () => {
   const [loading, setLoading] = useState(false)
 
   const handleGenerate = async () => {
+    if (!prompt.trim()) {
+      return
+    }
     setLoading(true)
     try {
        const response = await fetch(
