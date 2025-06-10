@@ -14,6 +14,7 @@ model User {
   email         String? // Optional email
   interests     String[]        @default([]) // Array of user interests
   playlistItems UserAudioFile[] // Audio saved to user's playlist
+  Audios     String[]        @default([])
 }
 
 model AudioFile {

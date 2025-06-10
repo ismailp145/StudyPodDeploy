@@ -115,6 +115,15 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       }
     });
 
+    await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      Audios: {
+        push: audioResult.audioFileId
+      }
+    }
+  });
+  
     // 6) Respond with full payload
     res.json({
       ...parsed,
