@@ -43,15 +43,15 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     - Content should be informative, well-structured, and appropriate for the requested duration
     - Extract 4-6 relevant keywords from the input that capture the main topics and concepts
     - Generate a concise summary of the content that captures the main points and insights
-    
     - Use a conversational tone with natural transitions
     - Include specific examples and practical insights where relevant
     - NO opening greetings or closing remarks - dive straight into content
+    - IMPORTANT: The podcast text should be about 100 words or less 
     - IMPORTANT: Return response as valid JSON only
     - IMPORTANT: Do NOT include any markdown formatting such as triple backticks or code blocks in your response.
 
     Example Inputs and Outputs:
-    Input: "Give me a 5 minute podcast on React"
+    Input: "Give me a 1 minute podcast on React"
     Output:
     {
     "title": "React Fundamentals: Building Modern UIs with Components and Virtual DOM",
