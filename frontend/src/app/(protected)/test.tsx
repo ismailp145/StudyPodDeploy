@@ -1,3 +1,4 @@
+// mobile/src/screens/Test.tsx
 import React, { useState, useContext } from 'react';
 import {
   View,
@@ -5,15 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
+  ActivityIndicator
 } from 'react-native';
 import PodcastPlayer from '../../components/PodcastPlayer';
 import { AuthContext } from '@/src/utils/authContext';
 
-const Search: React.FC = () => {
+const Test: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [pressed, setPressed] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
@@ -33,7 +31,7 @@ const Search: React.FC = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, firebaseId }),
+          body: JSON.stringify({ prompt, firebaseId }),  // ← include firebaseId
         }
       );
       if (!response.ok) {
@@ -55,14 +53,8 @@ const Search: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps="handled"
-      >
+    <View style={styles.container}>
+      <View style={styles.contentContainer}>
         <Text style={styles.title}>StudyPod</Text>
         <Text style={styles.subtitle}>Generate podcasts on any topic</Text>
 
@@ -106,8 +98,8 @@ const Search: React.FC = () => {
             )}
           </View>
         )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </View>
   );
 };
 
@@ -117,7 +109,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#23272A',
   },
   contentContainer: {
-    flexGrow: 1,
+    flex: 1,
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -173,4 +165,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Search;
+export default Test;

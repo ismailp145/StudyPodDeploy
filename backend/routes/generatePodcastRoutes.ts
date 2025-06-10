@@ -40,9 +40,10 @@ const systemPrompt = `
   - NO opening greetings or closing remarks - dive straight into content
   - IMPORTANT: Return response as valid JSON only
   - IMPORTANT: Do NOT include any markdown formatting such as triple backticks or code blocks in your response.
+  - IMPORTANT: Your response should be 50 words or less
 
   Example Inputs and Outputs:
-  Input: "Give me a 5 minute podcast on React"
+  Input: "Give me a podcast on React"
   Output:
   {
     "title": "React Fundamentals: Building Modern UIs with Components and Virtual DOM",
@@ -114,6 +115,15 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       }
     });
 
+    await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      Audios: {
+        push: audioResult.audioFileId
+      }
+    }
+  });
+  
     // 6) Respond with full payload
     res.json({
       ...parsed,
