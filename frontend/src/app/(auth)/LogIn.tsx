@@ -34,13 +34,9 @@ export default function LogIn() {
             
             // Ensure user exists in our backend
             try {
-                await axios.post('http://localhost:8080/users', {
-                    firebaseId: user.uid,
-                    email: user.email
-                });
+                await axios.get(`https://studypod-nvau.onrender.com/user/${user.uid}`);
             } catch (backendError: any) {
-                console.error('Error syncing user with backend:', backendError);
-                // Continue with login even if backend sync fails
+                console.error('Error user does not exist in firebase:', backendError);
             }
             
             console.log("Logged in user:", user.email);

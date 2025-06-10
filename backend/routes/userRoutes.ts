@@ -26,7 +26,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// Create or update user after Firebase authentication
+// Create new user
 router.post('/', async (req: Request, res: Response): Promise<void> => {
   const { firebaseId, email } = req.body;
 
@@ -36,47 +36,68 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Try to find existing user first
-    let user = await prisma.user.findUnique({
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
       where: { firebaseId }
     });
 
-    if (user) {
-      // Update existing user if needed
-      user = await prisma.user.update({
-        where: { firebaseId },
-        data: { email },
-        include: {
-          playlistItems: {
-            include: {
-              audioFile: true
-            }
-          }
-        }
-      });
-    } else {
-      // Create new user
-      const userData: Prisma.UserUncheckedCreateInput = {
-        firebaseId,
-        email
-      };
-      
-      user = await prisma.user.create({
-        data: userData,
-        include: {
-          playlistItems: {
-            include: {
-              audioFile: true
-            }
-          }
-        }
-      });
+    if (existingUser) {
+      res.status(409).json({ error: 'User already exists' });
+      return;
     }
+
+    // Create new user
+    const user = await prisma.user.create({
+      data: { firebaseId, email },
+      include: {
+        playlistItems: {
+          include: {
+            audioFile: true
+          }
+        }
+      }
+    });
 
     res.status(201).json({ user });
   } catch (error) {
-    console.error('Error creating/updating user:', error);
-    res.status(500).json({ error: 'Failed to create/update user' });
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+// Update existing user
+router.put('/:firebaseId', async (req: Request, res: Response): Promise<void> => {
+  const { firebaseId } = req.params;
+  const { email } = req.body;
+
+  try {
+    // Check if user exists
+    const existingUser = await prisma.user.findUnique({
+      where: { firebaseId }
+    });
+
+    if (!existingUser) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    // Update user
+    const user = await prisma.user.update({
+      where: { firebaseId },
+      data: { email },
+      include: {
+        playlistItems: {
+          include: {
+            audioFile: true
+          }
+        }
+      }
+    });
+
+    res.json({ user });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Failed to update user' });
   }
 });
 

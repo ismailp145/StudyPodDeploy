@@ -75,6 +75,7 @@ export default function SignUp() {
             // Create user with email and password in Firebase
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
+            console.log("firebase user object: ", user);
             
             // Update profile with display name in Firebase
             await updateProfile(user, {
@@ -83,15 +84,13 @@ export default function SignUp() {
 
             // Create user in our backend
             try {
-                await axios.post(`http://localhost:8080/users`, {
+                await axios.post(`https://studypod-nvau.onrender.com/user`, {
                     firebaseId: user.uid,
                     email: user.email
                 });
-            } catch (backendError: any) {
-                console.error('Error creating user in backend:', backendError);
+            } catch (err: any) {
+                console.error('Error creating user in backend:', err);
             }
-            
-            console.log("User registered:", user.email);
             
             // Navigate to the main app or onboarding
             authContext.logIn(); // Update auth context state
