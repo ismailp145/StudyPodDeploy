@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
-import Podcast from '@/src/components/Podcast';
+import Podcast from '@/src/components/PodcastCard';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { AuthContext } from '@/src/utils/authContext';
