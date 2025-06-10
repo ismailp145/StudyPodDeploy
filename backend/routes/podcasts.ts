@@ -53,14 +53,24 @@ const STATIC_PODCASTS = [
 // Initialize static podcasts
 router.post('/initialize', async (req: Request, res: Response): Promise<void> => {
   try {
-    // Check if we already have podcasts
-    const existingPodcasts = await prisma.podcastSummary.findMany();
-    if (existingPodcasts.length > 0) {
-      res.status(200).json({ message: 'Podcasts already initialized' });
-    }
+    // First, get all existing static podcasts by their titles
+    const existingStaticPodcasts = await prisma.podcastSummary.findMany({
+      where: {
+        title: {
+          in: STATIC_PODCASTS.map(p => p.title)
+        }
+      },
+      include: {
+        audio: true
+      }
+    });
 
-    // Create podcasts
-    for (const podcast of STATIC_PODCASTS) {
+    const existingTitles = new Set(existingStaticPodcasts.map(p => p.title));
+
+    // Create only the podcasts that don't exist yet
+    const newPodcasts = STATIC_PODCASTS.filter(podcast => !existingTitles.has(podcast.title));
+    
+    for (const podcast of newPodcasts) {
       // Create AudioFile entry
       const audioFile = await prisma.audioFile.create({
         data: {
@@ -70,8 +80,6 @@ router.post('/initialize', async (req: Request, res: Response): Promise<void> =>
           originalName: `${podcast.title.toLowerCase().replace(/\s+/g, '-')}.mp3`,
         }
       });
-
-      console.log(audioFile)
 
       // Create PodcastSummary entry
       await prisma.podcastSummary.create({
@@ -85,7 +93,19 @@ router.post('/initialize', async (req: Request, res: Response): Promise<void> =>
       });
     }
 
-    res.status(201).json({ message: 'Static podcasts initialized successfully' });
+    // Return all static podcasts (both existing and newly created)
+    const allStaticPodcasts = await prisma.podcastSummary.findMany({
+      where: {
+        title: {
+          in: STATIC_PODCASTS.map(p => p.title)
+        }
+      },
+      include: {
+        audio: true
+      }
+    });
+
+    res.status(200).json(allStaticPodcasts);
   } catch (error) {
     console.error('Error initializing podcasts:', error);
     res.status(500).json({ error: 'Failed to initialize podcasts' });
