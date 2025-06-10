@@ -31,7 +31,7 @@ const Test: React.FC = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, firebaseId }),  // ← include firebaseId
+          body: JSON.stringify({ prompt, firebaseId }), 
         }
       );
       if (!response.ok) {
