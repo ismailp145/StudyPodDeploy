@@ -79,10 +79,9 @@ const PodcastPlayer = ({ s3Url }: { s3Url: string }) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#2C2F33',
     borderRadius: 12,
     padding: 16,
     shadowColor: '#000',
@@ -99,7 +98,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#E0E0E0',
+    backgroundColor: '#23272A',
     borderRadius: 2,
     marginBottom: 8,
   },
@@ -114,7 +113,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 12,
-    color: '#666666',
+    color: '#B9BBBE',
   },
   controlsContainer: {
     flexDirection: 'row',
