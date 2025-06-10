@@ -18,7 +18,7 @@ const Search: React.FC = () => {
     setLoading(true)
     try {
       const response = await fetch(
-        'http://localhost:8080/generate-podcast',
+        'https://studypod-nvau.onrender.com/generate-podcast',
         {
           method: 'POST',
           headers: {
