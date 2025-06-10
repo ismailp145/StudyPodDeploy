@@ -1,4 +1,3 @@
-// mobile/src/screens/Test.tsx
 import React, { useState, useContext } from 'react';
 import {
   View,
@@ -6,12 +5,15 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import PodcastPlayer from '../../components/PodcastPlayer';
 import { AuthContext } from '@/src/utils/authContext';
 
-const Test: React.FC = () => {
+const Search: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [pressed, setPressed] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
@@ -31,7 +33,7 @@ const Test: React.FC = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, firebaseId }), 
+          body: JSON.stringify({ prompt, firebaseId }),
         }
       );
       if (!response.ok) {
@@ -53,8 +55,14 @@ const Test: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.contentContainer}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        keyboardShouldPersistTaps="handled"
+      >
         <Text style={styles.title}>StudyPod</Text>
         <Text style={styles.subtitle}>Generate podcasts on any topic</Text>
 
@@ -98,8 +106,8 @@ const Test: React.FC = () => {
             )}
           </View>
         )}
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -109,7 +117,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#23272A',
   },
   contentContainer: {
-    flex: 1,
+    flexGrow: 1,
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -165,4 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Test;
+export default Search;
