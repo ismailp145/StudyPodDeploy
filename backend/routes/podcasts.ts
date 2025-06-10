@@ -96,14 +96,29 @@ router.post('/initialize', async (req: Request, res: Response): Promise<void> =>
     // Return all static podcasts (both existing and newly created)
     const allStaticPodcasts = await prisma.podcastSummary.findMany({
       where: {
-        title: {
-          in: STATIC_PODCASTS.map(p => p.title)
-        }
+        AND: [
+          {
+            title: {
+              in: STATIC_PODCASTS.map(p => p.title)
+            }
+          },
+          {
+            // Only get podcasts that were created from initialization
+            audio: {
+              s3Key: {
+                startsWith: 'initialize/'
+              }
+            }
+          }
+        ]
       },
       include: {
         audio: true
       }
     });
+
+    // Log the results for debugging
+    console.log('Found static podcasts:', allStaticPodcasts.map(p => ({ id: p.id, title: p.title })));
 
     res.status(200).json(allStaticPodcasts);
   } catch (error) {

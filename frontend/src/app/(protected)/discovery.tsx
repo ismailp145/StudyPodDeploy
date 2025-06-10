@@ -35,7 +35,12 @@ const Discovery = () => {
     try {
       setError(null);
       const { data } = await axios.post<PodcastData[]>(`${API_BASE_URL}/podcasts/initialize`);
-      setPodcasts(data);
+      console.log('Received podcasts:', data);
+      const uniquePodcasts = Array.from(
+        new Map(data.map(podcast => [podcast.title, podcast])).values()
+      );
+      console.log('Unique podcasts:', uniquePodcasts);
+      setPodcasts(uniquePodcasts);
     } catch (error) {
       console.error('Error fetching podcasts:', error);
       setError('Failed to load podcasts. Please try again.');
