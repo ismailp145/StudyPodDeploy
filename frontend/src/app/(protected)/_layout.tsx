@@ -17,7 +17,6 @@ export default function TabsLayout () {
         <Tabs.Screen name="Home" options={{headerShown: false}}/>
         <Tabs.Screen name="Search" options={{headerShown: false}}/>
         <Tabs.Screen name="Settings" options={{headerShown: false}}/>
-        <Tabs.Screen name="test" options={{headerShown: false}}/>
     </Tabs>
   );
 }
