@@ -1,368 +1,211 @@
-import React, { useState , useContext } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+// app/SignUp.tsx
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  ScrollView,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
-import {auth} from '@/firebaseConfig';
+import { auth } from '@/firebaseConfig';
 import { AuthContext } from '@/src/utils/authContext';
 import axios from 'axios';
 
 export default function SignUp() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-    const router = useRouter();
-    const authContext = useContext(AuthContext);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const router = useRouter();
+  const { logIn } = useContext(AuthContext);
 
-    const validateEmail = (email: string) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
+  const handleSignUp = async () => {
+    setErrorMessage('');
+    if (!name || !email || !password || !confirmPassword) {
+      setErrorMessage('Please fill in all fields');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setErrorMessage('Passwords do not match');
+      return;
+    }
 
-    const validatePassword = (password: string) => {
-        // Check if password meets minimum length requirement
-        const isLengthValid = password.length >= 8;
-        
-        // Check if password contains at least one uppercase letter
-        const hasUpperCase = /[A-Z]/.test(password);
-        
-        // Check if password contains at least one lowercase letter
-        const hasLowerCase = /[a-z]/.test(password);
-        
-        // Check if password contains at least one number
-        const hasNumber = /[0-9]/.test(password);
-        
-        // Check if password contains at least one special character
-        const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-        
-        // Return true only if all criteria are met
-        return isLengthValid && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
-    };
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    const handleSignUp = async () => {
-        setErrorMessage(''); // Clear any previous errors
-        
-        // Form validation
-        if (!name || !email || !password || !confirmPassword) {
-            setErrorMessage('Please fill in all fields');
-            return;
-        }
+      // Set display name
+      await updateProfile(user, { displayName: name });
 
-        if (!validateEmail(email)) {
-            setErrorMessage('Please enter a valid email address');
-            return;
-        }
+      // Create in backend
+      try {
+        await axios.post('https://studypod-nvau.onrender.com/user', {
+          firebaseId: user.uid,
+          email: user.email,
+        });
+      } catch {
+        console.warn('Backend user creation failed');
+      }
 
-        if (!validatePassword(password)) {
-            setErrorMessage('Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
-            return;
-        }
+      // Store UID & navigate
+      logIn(user.uid);
+    } catch (error: any) {
+      let msg = 'Failed to create account. Please try again.';
+      if (error.code === 'auth/email-already-in-use')
+        msg = 'This email is already registered.';
+      if (error.code === 'auth/weak-password')
+        msg = 'Password is too weak.';
+      if (error.code === 'auth/invalid-email') msg = 'Please enter a valid email.';
+      setErrorMessage(msg);
+      console.error(error.code, error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-        if (password !== confirmPassword) {
-            setErrorMessage('Passwords do not match');
-            return;
-        }
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.subtitle}>Sign up to get started</Text>
 
-        setLoading(true);
-        
-        try {
-            // Create user with email and password in Firebase
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            console.log("firebase user object: ", user);
-            
-            // Update profile with display name in Firebase
-            await updateProfile(user, {
-                displayName: name
-            });
+        {errorMessage ? (
+          <View style={styles.errorContainer}>
+            <Ionicons name="alert-circle" size={20} color="#FF3B30" />
+            <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        ) : null}
 
-            // Create user in our backend
-            try {
-                await axios.post(`https://studypod-nvau.onrender.com/user`, {
-                    firebaseId: user.uid,
-                    email: user.email
-                });
-            } catch (err: any) {
-                console.error('Error creating user in backend:', err);
-            }
-            
-            // Navigate to the main app or onboarding
-            authContext.logIn(); // Update auth context state
-            router.replace('/');
-        } catch (error: any) {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            
-            let message = 'Failed to create account. Please try again.';
-            if (errorCode === 'auth/email-already-in-use') {
-                message = 'This email is already registered. Please use another email or log in.';
-            } else if (errorCode === 'auth/weak-password') {
-                message = 'Password is too weak. Please choose a stronger password.';
-            } else if (errorCode === 'auth/invalid-email') {
-                message = 'Please enter a valid email address';
-            }
-            
-            setErrorMessage(message);
-            console.error(errorCode, errorMessage);
-        } finally {
-            setLoading(false);
-        }
-    };
+        {/* Full Name */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Full Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your full name"
+            value={name}
+            onChangeText={setName}
+            placeholderTextColor="#666"
+          />
+        </View>
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="#333" />
-                </TouchableOpacity>
-            </View>
+        {/* Email */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your email"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            placeholderTextColor="#666"
+          />
+        </View>
 
-            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                <Text style={styles.title}>Create Account</Text>
-                <Text style={styles.subtitle}>Sign up to get started</Text>
+        {/* Password */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Create a password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              placeholderTextColor="#666"
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+              <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={24} color="#666" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-                {errorMessage ? (
-                    <View style={styles.errorContainer}>
-                        <Ionicons name="alert-circle" size={20} color="#FF3B30" />
-                        <Text style={styles.errorText}>{errorMessage}</Text>
-                    </View>
-                ) : null}
+        {/* Confirm Password */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Confirm Password</Text>
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={styles.passwordInput}
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirm}
+              placeholderTextColor="#666"
+            />
+            <TouchableOpacity onPress={() => setShowConfirm(!showConfirm)} style={styles.eyeIcon}>
+              <Ionicons name={showConfirm ? 'eye-off' : 'eye'} size={24} color="#666" />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-                <View style={styles.form}>
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Full Name</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your full name"
-                            value={name}
-                            onChangeText={setName}
-                            autoCapitalize="words"
-                            placeholderTextColor={'#666'}
-                        />
-                    </View>
+        {/* Sign Up Button */}
+        <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
+          {loading ? <ActivityIndicator color="#FFF" /> : <Text style={styles.buttonText}>Sign Up</Text>}
+        </TouchableOpacity>
 
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Email</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter your email"
-                            value={email}
-                            onChangeText={setEmail}
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                            placeholderTextColor={'#666'}
-                        />
-                    </View>
-
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Password</Text>
-                        <View style={styles.passwordContainer}>
-                            <TextInput
-                                style={styles.passwordInput}
-                                placeholder="Create a password"
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry={!showPassword}
-                                placeholderTextColor={'#666'}
-                            />
-                            <TouchableOpacity 
-                                onPress={() => setShowPassword(!showPassword)}
-                                style={styles.eyeIcon}
-                            >
-                                <Ionicons 
-                                    name={showPassword ? "eye-off" : "eye"} 
-                                    size={24} 
-                                    color="#666" 
-                                />
-                            </TouchableOpacity>
-                        </View>
-                        <Text style={styles.passwordHint}>
-                            Password must be at least 6 characters
-                        </Text>
-                    </View>
-
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Confirm Password</Text>
-                        <View style={styles.passwordContainer}>
-                            <TextInput
-                                style={styles.passwordInput}
-                                placeholder="Confirm your password"
-                                value={confirmPassword}
-                                onChangeText={setConfirmPassword}
-                                secureTextEntry={!showConfirmPassword}
-                                placeholderTextColor={'#666'}
-                            />
-                            <TouchableOpacity 
-                                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                                style={styles.eyeIcon} >
-                                <Ionicons 
-                                    name={showConfirmPassword ? "eye-off" : "eye"} 
-                                    size={24} 
-                                    color="#666" 
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-
-                    <TouchableOpacity 
-                        style={styles.button} 
-                        onPress={handleSignUp}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color="#FFFFFF" />
-                        ) : (
-                            <Text style={styles.buttonText}>Sign Up</Text>
-                        )}
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.footer}>
-                    <Text style={styles.footerText}>Already have an account? </Text>
-                    <TouchableOpacity onPress={() => router.push('/LogIn')}>
-                        <Text style={styles.loginText}>Log In</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={styles.termsText}>
-                    By signing up, you agree to our{' '}
-                    <Text style={styles.linkText} onPress={() => router.push('/')}>
-                        Terms of Service
-                    </Text>{' '}
-                    and{' '}
-                    <Text style={styles.linkText} onPress={() => router.push('/')}>
-                        Privacy Policy
-                    </Text>
-                </Text>
-            </ScrollView>
-        </SafeAreaView>
-    );
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>Already have an account?</Text>
+          <TouchableOpacity onPress={() => router.push('/LogIn')}>
+            <Text style={styles.loginText}>Log In</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#23272A', // Not Quite Black
-    },
-    header: {
-        flexDirection: 'row',
-        paddingHorizontal: 20,
-        paddingTop: 10,
-    },
-    backButton: {
-        padding: 8,
-    },
-    content: {
-        flex: 1,
-        padding: 20,
-    },
-    title: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#FFFFFF',
-        marginBottom: 8,
-        marginTop: 20,
-    },
-    subtitle: {
-        fontSize: 16,
-        color: '#B9BBBE',
-        marginBottom: 30,
-    },
-    form: {
-        marginBottom: 20,
-    },
-    inputContainer: {
-        marginBottom: 20,
-    },
-    label: {
-        fontSize: 14,
-        color: '#FFFFFF',
-        marginBottom: 8,
-        fontWeight: '500',
-    },
-    input: {
-        backgroundColor: '#2C2F33', // Dark Not Black
-        borderRadius: 8,
-        padding: 16,
-        fontSize: 16,
-        color: '#FFFFFF',
-    },
-    passwordContainer: {
-        flexDirection: 'row',
-        backgroundColor: '#2C2F33', // Dark Not Black
-        borderRadius: 8,
-        alignItems: 'center',
-    },
-    passwordInput: {
-        flex: 1,
-        padding: 16,
-        fontSize: 16,
-        color: '#FFFFFF',
-    },
-    eyeIcon: {
-        padding: 10,
-    },
-    passwordHint: {
-        fontSize: 12,
-        color: '#B9BBBE',
-        marginTop: 6,
-    },
-    button: {
-        backgroundColor: '#5865F2', // Blurple
-        borderRadius: 8,
-        paddingVertical: 16,
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
-    },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginVertical: 20,
-    },
-    footerText: {
-        color: '#B9BBBE',
-        fontSize: 14,
-    },
-    loginText: {
-        color: '#5865F2', // Blurple
-        fontWeight: '600',
-        fontSize: 14,
-    },
-    termsText: {
-        textAlign: 'center',
-        fontSize: 12,
-        color: '#B9BBBE',
-        marginBottom: 30,
-        paddingHorizontal: 20,
-    },
-    linkText: {
-        color: '#5865F2', // Blurple
-        fontWeight: '500',
-    },
-    errorContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#ED4245', // Discord Red
-        padding: 12,
-        borderRadius: 8,
-        marginBottom: 20,
-        opacity: 0.9,
-    },
-    errorText: {
-        color: '#FFFFFF',
-        marginLeft: 8,
-        flex: 1,
-        fontSize: 14,
-    },
+  container: { flex: 1, backgroundColor: '#23272A' },
+  header: { flexDirection: 'row', padding: 20, paddingTop: 10 },
+  backButton: { padding: 8 },
+  content: { padding: 20, paddingBottom: 40 },
+  title: { fontSize: 28, fontWeight: 'bold', color: '#FFF', marginBottom: 8, marginTop: 20 },
+  subtitle: { fontSize: 16, color: '#B9BBBE', marginBottom: 30 },
+  inputContainer: { marginBottom: 20 },
+  label: { fontSize: 14, color: '#FFF', marginBottom: 8 },
+  input: {
+    backgroundColor: '#2C2F33',
+    borderRadius: 8,
+    padding: 16,
+    color: '#FFF',
+    fontSize: 16,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#2C2F33',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  passwordInput: { flex: 1, padding: 16, color: '#FFF', fontSize: 16 },
+  eyeIcon: { padding: 10 },
+  button: { backgroundColor: '#5865F2', borderRadius: 8, padding: 16, alignItems: 'center' },
+  buttonText: { color: '#FFF', fontSize: 16, fontWeight: '600' },
+  footer: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
+  footerText: { color: '#B9BBBE', fontSize: 14 },
+  loginText: { color: '#5865F2', fontWeight: '600', marginLeft: 4 },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ED4245',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  errorText: { color: '#FFF', marginLeft: 8, flex: 1 },
 });
