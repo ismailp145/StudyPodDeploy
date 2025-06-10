@@ -189,4 +189,66 @@ router.post('/interests/:firebaseId', async (req: Request, res: Response): Promi
   }
 });
 
+// Add audio file to user's playlist
+router.post('/:firebaseId/playlist', async (req: Request, res: Response): Promise<void> => {
+  const { firebaseId } = req.params;
+  const { audioId } = req.body;
+
+  if (!audioId) {
+    res.status(400).json({ error: 'Audio ID is required' });
+    return;
+  }
+
+  try {
+    // Check if user exists
+    const user = await prisma.user.findUnique({
+      where: { firebaseId }
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+
+    // Check if audio file exists
+    const audioFile = await prisma.audioFile.findUnique({
+      where: { id: audioId }
+    });
+
+    if (!audioFile) {
+      res.status(404).json({ error: 'Audio file not found' });
+      return;
+    }
+
+    // Check if user already has this audio file in their playlist
+    const existingPlaylistItem = await prisma.userAudioFile.findFirst({
+      where: {
+        userId: user.id,
+        audioId: audioId
+      }
+    });
+
+    if (existingPlaylistItem) {
+      res.status(409).json({ error: 'Audio file already in playlist' });
+      return;
+    }
+
+    // Add audio file to user's playlist
+    const playlistItem = await prisma.userAudioFile.create({
+      data: {
+        userId: user.id,
+        audioId: audioId
+      },
+      include: {
+        audioFile: true
+      }
+    });
+
+    res.status(201).json({ playlistItem });
+  } catch (error) {
+    console.error('Error adding to playlist:', error);
+    res.status(500).json({ error: 'Failed to add to playlist' });
+  }
+});
+
 export default router;
