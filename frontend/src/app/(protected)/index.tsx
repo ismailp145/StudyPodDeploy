@@ -14,7 +14,7 @@ const Home = () => {
     setLoading(true)
     try {
        const response = await fetch(
-      'https://studypod-nvau.onrender.com/generate-podcast',   
+      'http://localhost:8080/generate-podcast',   
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

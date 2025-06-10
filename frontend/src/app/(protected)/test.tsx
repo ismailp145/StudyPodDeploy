@@ -1,57 +1,63 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
-import PodcastPlayer from '../../components/PodcastPlayer'
+// mobile/src/screens/Test.tsx
+import React, { useState, useContext } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator
+} from 'react-native';
+import PodcastPlayer from '../../components/PodcastPlayer';
+import { AuthContext } from '@/src/utils/authContext';
 
-const Search: React.FC = () => {
-  const [prompt, setPrompt] = useState('')
-  const [pressed, setPressed] = useState(false)
-  const [generatedContent, setGeneratedContent] = useState<string | null>(null)
-  const [url, setUrl] = useState<string | null>(null)
-  const [title, setTitle] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+const Test: React.FC = () => {
+  const [prompt, setPrompt] = useState('');
+  const [pressed, setPressed] = useState(false);
+  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [url, setUrl] = useState<string | null>(null);
+  const [title, setTitle] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const { firebaseId } = useContext(AuthContext);
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) {
-      return
-    }
+    if (!prompt.trim()) return;
 
-    setLoading(true)
+    setLoading(true);
     try {
       const response = await fetch(
         'http://localhost:8080/generate-podcast',
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ prompt }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, firebaseId }),  // ← include firebaseId
         }
-      )
+      );
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json()
+      const data = await response.json();
 
-      // The route returns { title, content, keywords, summary, id, audioUrl, s3Key }
-      setGeneratedContent(data.content)
-      setTitle(data.title)
-      setUrl(data.audioUrl) // audioUrl points to S3 or wherever you stored it
-      setPressed(true)
+      setGeneratedContent(data.content);
+      setTitle(data.title);
+      setUrl(data.audioUrl);
+      setPressed(true);
     } catch (error) {
-      console.error('Error generating content:', error)
-      setGeneratedContent('Failed to generate content. Please try again.')
-      setPressed(true)
+      console.error('Error generating content:', error);
+      setGeneratedContent('Failed to generate content. Please try again.');
+      setPressed(true);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.contentContainer}>
         <Text style={styles.title}>StudyPod</Text>
         <Text style={styles.subtitle}>Generate podcasts on any topic</Text>
-        
+
         {!pressed ? (
           <View style={styles.inputContainer}>
             <TextInput
@@ -62,10 +68,7 @@ const Search: React.FC = () => {
               onChangeText={setPrompt}
               multiline
             />
-            <TouchableOpacity 
-              style={styles.button} 
-              onPress={handleGenerate}
-            >
+            <TouchableOpacity style={styles.button} onPress={handleGenerate}>
               <Text style={styles.buttonText}>Generate Podcast</Text>
             </TouchableOpacity>
           </View>
@@ -78,18 +81,15 @@ const Search: React.FC = () => {
                 {generatedContent && (
                   <Text style={styles.resultText}>{generatedContent}</Text>
                 )}
-                {url && title && (
-                  <PodcastPlayer s3Url={url} />
-                )}
-                <TouchableOpacity 
-                  style={[styles.button, { marginTop: 20 }]} 
+                {url && title && <PodcastPlayer s3Url={url} />}
+                <TouchableOpacity
+                  style={[styles.button, { marginTop: 20 }]}
                   onPress={() => {
-                    // Reset everything so the user can start again
-                    setPressed(false)
-                    setPrompt('')
-                    setGeneratedContent(null)
-                    setUrl(null)
-                    setTitle(null)
+                    setPressed(false);
+                    setPrompt('');
+                    setGeneratedContent(null);
+                    setUrl(null);
+                    setTitle(null);
                   }}
                 >
                   <Text style={styles.buttonText}>Start a New Podcast</Text>
@@ -100,8 +100,8 @@ const Search: React.FC = () => {
         )}
       </View>
     </View>
-  )
-}
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     maxWidth: 500,
   },
   input: {
-    backgroundColor: '#2C2F33', 
+    backgroundColor: '#2C2F33',
     borderRadius: 8,
     padding: 16,
     color: '#FFFFFF',
@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    backgroundColor: '#5865F2', 
+    backgroundColor: '#5865F2',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
@@ -163,6 +163,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginBottom: 16,
   },
-})
+});
 
-export default Search
+export default Test;
