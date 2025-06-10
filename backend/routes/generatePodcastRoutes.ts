@@ -3,7 +3,6 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { PrismaClient } from '../generated/prisma';
 import { createAndSaveToS3AudioFile } from '../services/audioService';
-//test
 
 dotenv.config();
 const prisma = new PrismaClient();
