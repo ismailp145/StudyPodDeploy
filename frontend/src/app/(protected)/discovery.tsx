@@ -34,7 +34,7 @@ const Discovery = () => {
   const fetchPodcasts = async () => {
     try {
       setError(null);
-      const { data } = await axios.get<PodcastData[]>(`${API_BASE_URL}/podcasts`);
+      const { data } = await axios.post<PodcastData[]>(`${API_BASE_URL}/podcasts/initialize`);
       setPodcasts(data);
     } catch (error) {
       console.error('Error fetching podcasts:', error);
