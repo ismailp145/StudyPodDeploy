@@ -79,7 +79,7 @@ const Search: React.FC = () => {
                   <Text style={styles.resultText}>{generatedContent}</Text>
                 )}
                 {url && title && (
-                  <PodcastPlayer audioUrl={url} title={title} />
+                  <PodcastPlayer s3Url={url} />
                 )}
                 <TouchableOpacity 
                   style={[styles.button, { marginTop: 20 }]} 
