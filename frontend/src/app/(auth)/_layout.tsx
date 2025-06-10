@@ -11,6 +11,7 @@ export default function AuthLayout() {
                     headerShown: false,
                     animation: 'slide_from_right',
                 }}
+                initialRouteName="Home"
             />
         </View>
     );
