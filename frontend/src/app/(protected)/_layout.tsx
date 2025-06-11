@@ -43,12 +43,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Create",
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="arch" size={size} color={color} />
+            <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
           ),
           tabBarLabel: ({ color }) => (
-            <Text style={{ color, fontSize: 12, marginTop: 4 }}>Home</Text>
+            <Text style={{ color, fontSize: 12, marginTop: 4 }}>Create</Text>
           ),
         }}
       />
@@ -77,19 +77,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="create"
-        options={{
-          title: "Create",
-          tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
-          ),
-          tabBarLabel: ({ color }) => (
-            <Text style={{ color, fontSize: 12, marginTop: 4 }}>Create</Text>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="Settings"
+        name="settings"
         options={{
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
