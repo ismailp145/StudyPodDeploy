@@ -49,10 +49,15 @@ export default function Discovery() {
   const router = useRouter();
 
   const fetchInitial = useCallback(async () => {
-    const res = await axios.post<PodcastData[]>(
+    const res = await axios.post<any[]>(
       `${API_BASE_URL}/podcasts/initialize`
     );
-    return res.data;
+    return res.data.map(podcast => ({
+      id: podcast.id,
+      title: podcast.title,
+      summary: podcast.summary,
+      audioUrl: podcast.audio.url
+    }));
   }, []);
 
   const fetchDiscovery = useCallback(async () => {
