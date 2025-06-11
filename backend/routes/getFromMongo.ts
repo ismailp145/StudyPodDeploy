@@ -121,20 +121,16 @@ router.get('/audio-file-by-keywords', async (req: Request, res: Response): Promi
       return;
     }
 
-    // 1️⃣  Extract keywords from the user prompt
     const keywords = filterKeywords(prompt);   // e.g. ["React", "virtual DOM"]
 
-    // 2️⃣  Look for a matching summary that shares *any* of those keywords
-    //      and eagerly load its linked audio file (1-to-1 relation).
+    
     const existing = await prisma.podcastSummary.findFirst({
       where: { keywords: { hasSome: keywords } },
       include: { audio: true },                // pull the AudioFile row too
     });
 
-    // 3️⃣  If we found one, return it; otherwise signal “not found”
     if (existing && existing.audio) {
       
-    // 4) Find the user by their Firebase UID
     const user = await prisma.user.findUnique({
       where: { firebaseId }
     });
@@ -143,7 +139,6 @@ router.get('/audio-file-by-keywords', async (req: Request, res: Response): Promi
       res.status(404).json({ error: 'User not found for that firebaseId' });
       return;
     }
-        // 5) Link the audio to that user
         await prisma.userAudioFile.create({
           data: {
             userId:  user.id,

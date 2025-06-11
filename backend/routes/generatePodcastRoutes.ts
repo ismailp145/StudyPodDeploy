@@ -74,20 +74,17 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
   
   try {
-    // 1) Generate the text response
     const result = await geminiModel.generateContent([systemPrompt, prompt]);
     const raw = result.response.text();
     const cleaned = raw.replace(/^```json\s*|```$/g, '').trim();
     const parsed = JSON.parse(cleaned) as PodcastGenerationResponse;
 
-    // 2) Create & upload audio
     const audioResult = await createAndSaveToS3AudioFile(
       parsed.content,
       parsed.title,
       voice
     );
 
-    // 3) Save the PodcastSummary linked to that AudioFile
     const savedSummary = await prisma.podcastSummary.create({
       data: {
         title:    parsed.title,
@@ -101,7 +98,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       include: { audio: true }
     });
 
-    // 4) Find the user by their Firebase UID
     const user = await prisma.user.findUnique({
       where: { firebaseId }
     });
@@ -110,7 +106,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // 5) Link the audio to that user
     await prisma.userAudioFile.create({
       data: {
         userId:  user.id,
@@ -127,7 +122,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     }
   });
   
-    // 6) Respond with full payload
     res.json({
       ...parsed,
       id:       savedSummary.id,
