@@ -142,54 +142,5 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     });
   }
 });
-// --------------------------------------------------------------------
-// GET /generate-podcast?prompt=...&firebaseId=...
-// – Looks for an existing podcast whose keyword set overlaps with
-//   the keywords extracted from the prompt.
-// – If found, returns it (including the audio URL) and *does not*
-//   create anything new.
-// – If not found, responds with 404 so that the client can fall
-//   back to the POST route to create a brand-new episode.
-// --------------------------------------------------------------------
-router.get('/', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const prompt     = String(req.query.prompt ?? '').trim();
-    const firebaseId = String(req.query.firebaseId ?? '').trim();
-
-    if (!prompt || !firebaseId) {
-      res.status(400).json({ error: 'Both prompt and firebaseId are required' });
-      return;
-    }
-
-    // 1️⃣  Extract keywords from the user prompt
-    const keywords = filterKeywords(prompt);   // e.g. ["React", "virtual DOM"]
-
-    // 2️⃣  Look for a matching summary that shares *any* of those keywords
-    //      and eagerly load its linked audio file (1-to-1 relation).
-    const existing = await prisma.podcastSummary.findFirst({
-      where: { keywords: { hasSome: keywords } },
-      include: { audio: true },                // pull the AudioFile row too
-    });
-
-    // 3️⃣  If we found one, return it; otherwise signal “not found”
-    if (existing && existing.audio) {
-      res.json({
-        id:        existing.id,
-        title:     existing.title,
-        content:   existing.content,
-        summary:   existing.summary,
-        keywords:  existing.keywords,
-        audioUrl:  existing.audio.url,   // public / signed S3 URL
-        s3Key:     existing.audio.s3Key,
-      });
-    } else {
-      res.status(404).json({ message: 'No cached podcast found' });
-    }
-  } catch (error) {
-    console.error('GET /generate-podcast error:', error);
-    res.status(500).json({ error: 'Failed to look up podcast' });
-  }
-});
-
 
 export default router;

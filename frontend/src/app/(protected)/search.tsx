@@ -39,7 +39,7 @@ const Search: React.FC = () => {
 
       const query = new URLSearchParams({ prompt, firebaseId }).toString();
       const getRes = await fetch(
-        `https://studypod-nvau.onrender.com/generate-podcast?${query}`
+        `https://studypod-nvau.onrender.com/mongo/audio-file-by-keywords?${query}`
       );
 
       if (getRes.ok) {
