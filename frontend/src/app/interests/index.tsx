@@ -4,6 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from "expo-router";
 import axios from 'axios';
 import { AuthContext } from "@/src/utils/authContext";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 const INTEREST_CATEGORIES = {
   "Academic": [
@@ -56,6 +57,7 @@ const Info = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const { firebaseId } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
 
   const toggleInterest = (interest: string) => {
     setSelectedInterests(prev =>
@@ -106,74 +108,76 @@ const Info = () => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBar}>
-            <View 
-              style={[
-                styles.progressFill, 
-                { width: `${getProgressPercentage()}%` }
-              ]} 
-            />
-          </View>
-          <Text style={styles.progressText}>
-            {selectedInterests.length}/{MINIMUM_INTERESTS} interests selected
-          </Text>
-        </View>
-
-        <Text style={styles.title}>Welcome to StudyPod!</Text>
-        <Text style={styles.subtitle}>
-          Select at least {MINIMUM_INTERESTS} interests to help us personalize your learning experience
-        </Text>
-        
-        {Object.entries(INTEREST_CATEGORIES).map(([category, interests]) => (
-          <View key={category} style={styles.categoryContainer}>
-            <Text style={styles.categoryTitle}>
-              <MaterialIcons name="category" size={20} color="#5865F2" /> {category}
-            </Text>
-            <View style={styles.interestsContainer}>
-              {interests.map((interest) => (
-                <TouchableOpacity
-                  key={interest}
-                  style={[
-                    styles.interestButton,
-                    selectedInterests.includes(interest) && styles.selectedInterest,
-                  ]}
-                  onPress={() => toggleInterest(interest)}
-                >
-                  <Text
-                    style={[
-                      styles.interestText,
-                      selectedInterests.includes(interest) && styles.selectedInterestText,
-                    ]}
-                  >
-                    {interest}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView style={styles.scrollView}>
+        <View style={[styles.content, { paddingTop: insets.top + 20 }]}>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View 
+                style={[
+                  styles.progressFill, 
+                  { width: `${getProgressPercentage()}%` }
+                ]} 
+              />
             </View>
-          </View>
-        ))}
-
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            (selectedInterests.length < MINIMUM_INTERESTS || isSubmitting) && styles.disabledButton,
-          ]}
-          onPress={handleSubmit}
-          disabled={selectedInterests.length < MINIMUM_INTERESTS || isSubmitting}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>
-              Continue to Your Feed
+            <Text style={styles.progressText}>
+              {selectedInterests.length}/{MINIMUM_INTERESTS} interests selected
             </Text>
-          )}
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          </View>
+
+          <Text style={styles.title}>Welcome to StudyPod!</Text>
+          <Text style={styles.subtitle}>
+            Select at least {MINIMUM_INTERESTS} interests to help us personalize your learning experience
+          </Text>
+          
+          {Object.entries(INTEREST_CATEGORIES).map(([category, interests]) => (
+            <View key={category} style={styles.categoryContainer}>
+              <Text style={styles.categoryTitle}>
+                <MaterialIcons name="category" size={20} color="#5865F2" /> {category}
+              </Text>
+              <View style={styles.interestsContainer}>
+                {interests.map((interest) => (
+                  <TouchableOpacity
+                    key={interest}
+                    style={[
+                      styles.interestButton,
+                      selectedInterests.includes(interest) && styles.selectedInterest,
+                    ]}
+                    onPress={() => toggleInterest(interest)}
+                  >
+                    <Text
+                      style={[
+                        styles.interestText,
+                        selectedInterests.includes(interest) && styles.selectedInterestText,
+                      ]}
+                    >
+                      {interest}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          ))}
+
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              (selectedInterests.length < MINIMUM_INTERESTS || isSubmitting) && styles.disabledButton,
+            ]}
+            onPress={handleSubmit}
+            disabled={selectedInterests.length < MINIMUM_INTERESTS || isSubmitting}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>
+                Continue to Your Feed
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -184,13 +188,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#23272A',
   },
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+  scrollView: {
+    flex: 1,
   },
   content: {
     padding: 20,
-    paddingTop: 40,
   },
   progressContainer: {
     marginBottom: 30,
