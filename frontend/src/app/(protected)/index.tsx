@@ -15,7 +15,7 @@ import VoiceSelector from '../../components/VoiceSelector';
 import { AuthContext } from '@/src/utils/authContext';
 import { Redirect } from 'expo-router';
   
-const index: React.FC = () => {
+const Index: React.FC = () => {
   const [prompt, setPrompt] = useState('');
   const [selectedVoice, setSelectedVoice] = useState<string>(
     's3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json'
@@ -216,4 +216,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default index;
+export default Index;
