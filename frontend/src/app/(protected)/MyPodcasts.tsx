@@ -1,5 +1,3 @@
-// screens/MyPodcasts.tsx
-
 import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
@@ -23,7 +21,6 @@ interface RawEntry {
     s3Key: string;
     originalName?: string;
     uploadDate: string;
-    // ← pull in the 1:1 PodcastSummary relation
     summary?: {
       id: string;
       title: string;
@@ -60,31 +57,24 @@ const MyPodcasts: React.FC = () => {
     try {
       const resp = await axios.get<RawEntry[]>(
         'https://studypod-nvau.onrender.com/mongo/user-audio-files',
-        {
-          // tell Prisma to include the summary relation
-          params: { includeSummary: true } 
-        }
+        { params: { includeSummary: true } }
       );
 
-      // filter down to only this user
-      const userEntries = resp.data.filter(e => e.user.firebaseId === firebaseId);
+      const userEntries = resp.data.filter(
+        e => e.user.firebaseId === firebaseId
+      );
 
       const podcasts: PodcastItem[] = userEntries.map(e => {
-        const { id, s3Key, originalName, uploadDate, summary: sum } = e.audioFile;
-        // human‐readable upload date
+        const { id, s3Key, originalName, uploadDate, summary: sum } =
+          e.audioFile;
         const date = new Date(uploadDate).toLocaleDateString();
 
-        // use the generated title/summary if present
-        const titleText    = sum?.title    ?? originalName ?? 'Untitled Podcast';
-        const summaryText  = sum?.summary  ?? `Uploaded on ${date}`;
-        const audioUrl     = `${S3_BASE_URL}/${s3Key}`;
+        const titleText = sum?.title ?? originalName ?? 'Untitled Podcast';
+        const summaryText =
+          sum?.summary ?? `Uploaded on ${date}`;
+        const audioUrl = `${S3_BASE_URL}/${s3Key}`;
 
-        return {
-          id,
-          title:   titleText,
-          summary: summaryText,
-          audioUrl,
-        };
+        return { id, title: titleText, summary: summaryText, audioUrl };
       });
 
       setItems(podcasts);
@@ -97,7 +87,6 @@ const MyPodcasts: React.FC = () => {
     }
   };
 
-  // reload on focus or login
   useEffect(() => {
     if (isFocused && firebaseId) {
       setLoading(true);
@@ -110,66 +99,60 @@ const MyPodcasts: React.FC = () => {
     fetchUserPodcasts();
   };
 
-  if (loading) {
+  // unified container for all states
+  if (loading || error || items.length === 0) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#5865F2" />
-      </View>
-    );
-  }
-
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.errorText}>{error}</Text>
-      </View>
-    );
-  }
-
-  if (items.length === 0) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.emptyText}>You have no saved podcasts yet.</Text>
+      <View style={styles.container}>
+        {loading && (
+          <ActivityIndicator size="large" color="#5865F2" />
+        )}
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        {!loading && !error && items.length === 0 && (
+          <Text style={styles.emptyText}>
+            You have no saved podcasts yet.
+          </Text>
+        )}
       </View>
     );
   }
 
   return (
-    <FlatList
-      data={items}
-      keyExtractor={i => i.id}
-      numColumns={2}
-      contentContainerStyle={styles.grid}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          colors={['#5865F2']}
-          tintColor="#5865F2"
-        />
-      }
-      renderItem={({ item }) => (
-        <Podcast
-          id={item.id}
-          title={item.title}
-          summary={item.summary}
-          audioUrl={item.audioUrl}
-        />
-      )}
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={items}
+        keyExtractor={item => item.id}
+        numColumns={2}
+        contentContainerStyle={styles.grid}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#5865F2']}
+            tintColor="#5865F2"
+          />
+        }
+        renderItem={({ item }) => (
+          <Podcast
+            id={item.id}
+            title={item.title}
+            summary={item.summary}
+            audioUrl={item.audioUrl}
+          />
+        )}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  center: {
+  container: {
     flex: 1,
-    backgroundColor: '#23272A',
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
+    backgroundColor: '#23272A',
   },
   grid: {
-    padding: 8,
+    paddingHorizontal: 8,
+    paddingBottom: 16,
   },
   errorText: {
     color: '#ED4245',
@@ -179,6 +162,7 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#FFFFFF',
     fontSize: 16,
+    textAlign: 'center',
   },
 });
 
