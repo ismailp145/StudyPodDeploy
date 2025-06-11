@@ -8,6 +8,7 @@ import {
   RefreshControl,
   StatusBar,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import Podcast from '@/src/components/PodcastCard';
@@ -105,7 +106,7 @@ const MyPodcasts: React.FC = () => {
   // unified container for all states
   if (loading || error || items.length === 0) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <StatusBar barStyle="light-content" />
         <LinearGradient
           colors={['#23272A', '#2C2F33']}
@@ -137,21 +138,19 @@ const MyPodcasts: React.FC = () => {
             </View>
           )}
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
         colors={['#23272A', '#2C2F33']}
         style={styles.headerGradient}
       >
-        <Text style={styles.headerTitle}>Let&apos;s get to listening!</Text>
-        <Text style={styles.headerSubtitle}>
-          {items.length} {items.length === 1 ? 'podcast' : 'podcasts'} in your library
-        </Text>
+        <Text style={styles.headerTitle}>My Playlist</Text>
+        <Text style={styles.headerSubtitle}>Your personal podcast collection</Text>
       </LinearGradient>
       <FlatList
         data={items}
@@ -175,7 +174,7 @@ const MyPodcasts: React.FC = () => {
           />
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -185,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#23272A',
   },
   headerGradient: {
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingTop: 10,
     paddingBottom: 20,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 20,

@@ -1,12 +1,13 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from "react-native";
 import { AuthContext } from "@/src/utils/authContext";
 
 const Settings = () => {
   const authState = useContext(AuthContext);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
       <View style={styles.content}>
         <Text style={styles.title}>Settings</Text>
         <Text style={styles.subtitle}>This is the settings page.</Text>
@@ -14,7 +15,7 @@ const Settings = () => {
       <TouchableOpacity style={styles.button} onPress={() => authState.logOut()}>
         <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -26,7 +27,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#23272A',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
   content: {
     marginBottom: 40,

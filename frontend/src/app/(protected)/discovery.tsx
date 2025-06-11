@@ -9,6 +9,7 @@ import {
   RefreshControl,
   StatusBar,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
@@ -118,21 +119,21 @@ export default function Discovery() {
   if (!firebaseId) return null;
   if (loading) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color="#5865F2" />
-      </View>
+      </SafeAreaView>
     );
   }
   if (error) {
     return (
-      <View style={styles.centered}>
+      <SafeAreaView style={styles.centered}>
         <Text style={styles.errorText}>{error}</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <LinearGradient
         colors={['#23272A', '#2C2F33']}
@@ -184,17 +185,20 @@ export default function Discovery() {
           />
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#23272A' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#23272A',
+  },
   scrollViewContent: {
     flex: 1,
   },
   headerGradient: {
-    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingTop: 10,
     paddingBottom: 20,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 20,

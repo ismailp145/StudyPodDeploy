@@ -9,6 +9,8 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  StatusBar,
 } from 'react-native';
 import PodcastPlayer from '../../components/PodcastPlayer';
 import VoiceSelector from '../../components/VoiceSelector';
@@ -103,81 +105,84 @@ const Index: React.FC = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      {showSuccess && (
-        <View style={styles.successContainer}>
-          <Text style={styles.successText}>Podcast saved to your playlist!</Text>
-        </View>
-      )}
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoidingView}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Text style={styles.title}>StudyPod</Text>
-        <Text style={styles.subtitle}>Generate podcasts on any topic</Text>
-
-        {!pressed ? (
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter a topic or prompt..."
-              placeholderTextColor="#72767D"
-              value={prompt}
-              onChangeText={setPrompt}
-              multiline
-            />
-            <VoiceSelector
-              onVoiceSelect={setSelectedVoice}
-              selectedVoice={selectedVoice}
-            />
-            <TouchableOpacity 
-              style={[styles.button, loading && styles.buttonDisabled]} 
-              onPress={handleGenerate}
-              disabled={loading}
-            >
-              {loading ? (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                  <Text style={[styles.buttonText, styles.loadingText]}>Generating Podcast...</Text>
-                </View>
-              ) : (
-                <Text style={styles.buttonText}>Generate Podcast</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.resultContainer}>
-            {loading ? (
-              <ActivityIndicator size="large" color="#5865F2" />
-            ) : (
-              <>
-                {summary && (
-                  <Text style={styles.resultText}>{summary}</Text>  // ← show summary
-                )}
-                {url && title && (
-                  <PodcastPlayer s3Url={url} isExpanded={true} />
-                )}
-                <TouchableOpacity
-                  style={[styles.button, { marginTop: 20 }]}
-                  onPress={() => {
-                    setPressed(false);
-                    setPrompt('');
-                    setSummary(null);    // ← reset summary
-                    setUrl(null);
-                    setTitle(null);
-                  }}
-                >
-                  <Text style={styles.buttonText}>Generate a New Podcast</Text>
-                </TouchableOpacity>
-              </>
-            )}
+        {showSuccess && (
+          <View style={styles.successContainer}>
+            <Text style={styles.successText}>Podcast saved to your playlist!</Text>
           </View>
         )}
-      </ScrollView>
-    </KeyboardAvoidingView>
+        <ScrollView
+          contentContainerStyle={styles.contentContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.title}>StudyPod</Text>
+          <Text style={styles.subtitle}>Generate podcasts on any topic</Text>
+
+          {!pressed ? (
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter a topic or prompt..."
+                placeholderTextColor="#72767D"
+                value={prompt}
+                onChangeText={setPrompt}
+                multiline
+              />
+              <VoiceSelector
+                onVoiceSelect={setSelectedVoice}
+                selectedVoice={selectedVoice}
+              />
+              <TouchableOpacity 
+                style={[styles.button, loading && styles.buttonDisabled]} 
+                onPress={handleGenerate}
+                disabled={loading}
+              >
+                {loading ? (
+                  <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <Text style={[styles.buttonText, styles.loadingText]}>Generating Podcast...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.buttonText}>Generate Podcast</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.resultContainer}>
+              {loading ? (
+                <ActivityIndicator size="large" color="#5865F2" />
+              ) : (
+                <>
+                  {summary && (
+                    <Text style={styles.resultText}>{summary}</Text>  // ← show summary
+                  )}
+                  {url && title && (
+                    <PodcastPlayer s3Url={url} isExpanded={true} />
+                  )}
+                  <TouchableOpacity
+                    style={[styles.button, { marginTop: 20 }]}
+                    onPress={() => {
+                      setPressed(false);
+                      setPrompt('');
+                      setSummary(null);    // ← reset summary
+                      setUrl(null);
+                      setTitle(null);
+                    }}
+                  >
+                    <Text style={styles.buttonText}>Generate a New Podcast</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 
@@ -185,6 +190,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#23272A',
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   contentContainer: {
     flexGrow: 1,
@@ -272,7 +280,7 @@ const styles = StyleSheet.create({
   },
   successContainer: {
     position: 'absolute',
-    top: 20,
+    top: 10,
     left: 20,
     right: 20,
     backgroundColor: '#43B581',

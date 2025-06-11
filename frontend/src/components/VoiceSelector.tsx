@@ -3,10 +3,10 @@ import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList, Platform } f
 import { Ionicons } from '@expo/vector-icons';
 
 const AVAILABLE_VOICES: { [key: string]: string } = {
-  'Ruby : Female British – Soft-spoken and thoughtful': 's3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json',
-  'Charles : Male American – Formal and articulate': 's3://voice-cloning-zero-shot/9f1ee23a-9108-4538-90be-8e62efc195b6/charlessaad/manifest.json',
-  'Madison : Female English – Calm and measured': 's3://voice-cloning-zero-shot/473c81b1-93ea-4662-9e63-7d65392e5f9b/madisonsaad/manifest.json',
-  'Calvin : Male American – Clear and expressive' : "s3://voice-cloning-zero-shot/743575eb-efdc-4c10-b185-a5018148822f/original/manifest.json"
+  'Ruby : Female British – Soft-spoken': 's3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json',
+  'Charles : Male American – Articulate': 's3://voice-cloning-zero-shot/9f1ee23a-9108-4538-90be-8e62efc195b6/charlessaad/manifest.json',
+  'Madison : Female English – Calm': 's3://voice-cloning-zero-shot/473c81b1-93ea-4662-9e63-7d65392e5f9b/madisonsaad/manifest.json',
+  'Calvin : Male American – Clear expressive' : "s3://voice-cloning-zero-shot/743575eb-efdc-4c10-b185-a5018148822f/original/manifest.json"
   // Add more voices as needed
 };
 
