@@ -12,7 +12,7 @@ export default function TabsLayout() {
   if (!isLoggedIn) return <Redirect href="/(auth)/Home" />;
 
   const iconMap: Record<string, IconName> = {
-    Home: "home",
+    index: "home",
     test: "home",
     Settings: "setting",
     MyPodcasts: "sound",
@@ -20,7 +20,7 @@ export default function TabsLayout() {
   };
 
   const titleMap: Record<string, string> = {
-    index: "Home",
+    index: "index",
     test: "Test",
     Settings: "Settings",
     MyPodcasts: "My Podcasts",
@@ -61,7 +61,7 @@ export default function TabsLayout() {
         };
       }}
     >
-      <Tabs.Screen name="Home" />
+      <Tabs.Screen name="index" />
       <Tabs.Screen name="MyPodcasts" />
       <Tabs.Screen name="discovery" />
       <Tabs.Screen name="Settings" />
