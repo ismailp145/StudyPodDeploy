@@ -11,10 +11,12 @@ import {
   Platform,
 } from 'react-native';
 import PodcastPlayer from '../../components/PodcastPlayer';
+import VoiceSelector from '../../components/VoiceSelector';
 import { AuthContext } from '@/src/utils/authContext';
 
 const Search: React.FC = () => {
   const [prompt, setPrompt] = useState('');
+  const [selectedVoice, setSelectedVoice] = useState<string>('s3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json');
   const [pressed, setPressed] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
@@ -54,7 +56,11 @@ const Search: React.FC = () => {
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt, firebaseId }),
+          body: JSON.stringify({ 
+            prompt, 
+            firebaseId,
+            voice: selectedVoice 
+          }),
         }
       );
       
@@ -98,6 +104,10 @@ const Search: React.FC = () => {
               onChangeText={setPrompt}
               multiline
             />
+            <VoiceSelector
+              onVoiceSelect={setSelectedVoice}
+              selectedVoice={selectedVoice}
+            />
             <TouchableOpacity style={styles.button} onPress={handleGenerate}>
               <Text style={styles.buttonText}>Generate Podcast</Text>
             </TouchableOpacity>
@@ -111,7 +121,7 @@ const Search: React.FC = () => {
                 {generatedContent && (
                   <Text style={styles.resultText}>{generatedContent}</Text>
                 )}
-                {url && title && <PodcastPlayer s3Url={url} />}
+                {url && title && (<PodcastPlayer s3Url={url} isExpanded={true}/>)}
                 <TouchableOpacity
                   style={[styles.button, { marginTop: 20 }]}
                   onPress={() => {

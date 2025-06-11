@@ -50,7 +50,7 @@ const generateSafeFilename = (filename?: string): string => {
 };
 
 // Main TTS generation function
-export const createAndSaveToS3AudioFile = async (text: string, filename?: string): Promise<TTSResult> => {
+export const createAndSaveToS3AudioFile = async (text: string, filename?: string, voice?: string): Promise<TTSResult> => {
   ensureOutputDir();
   const safeName = generateSafeFilename(filename);
   const outputFilePath = path.join(OUTPUT_DIR, safeName);
@@ -58,7 +58,7 @@ export const createAndSaveToS3AudioFile = async (text: string, filename?: string
   const payload = {
     voice_engine: 'Play3.0',
     text,
-    voice: VOICE,
+    voice: voice,
     output_format: 'mp3',
     sample_rate: 44100,
     speed: 1,
