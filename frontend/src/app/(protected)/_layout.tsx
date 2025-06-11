@@ -20,11 +20,11 @@ export default function TabsLayout() {
   };
 
   const titleMap: Record<string, string> = {
-    index: "index",
+    index: "Create",
     test: "Test",
     Settings: "Settings",
-    MyPodcasts: "My Podcasts",
-    discovery: "Discovery",
+    MyPodcasts: "My Playlist",
+    discovery: "Explore",
   };
 
   return (
