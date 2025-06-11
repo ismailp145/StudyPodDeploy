@@ -69,7 +69,7 @@ const MyPodcasts: React.FC = () => {
       );
 
       const podcasts: PodcastItem[] = userEntries.map(e => {
-        const { id, s3Key, originalName, uploadDate, summary: sum } =
+        const { id: audioFileId, s3Key, originalName, uploadDate, summary: sum } =
           e.audioFile;
         const date = new Date(uploadDate).toLocaleDateString();
 
@@ -78,7 +78,10 @@ const MyPodcasts: React.FC = () => {
           sum?.summary ?? `Uploaded on ${date}`;
         const audioUrl = `${S3_BASE_URL}/${s3Key}`;
 
-        return { id, title: titleText, summary: summaryText, audioUrl };
+        // Create a unique ID by combining entry ID and audio file ID
+        const uniqueId = `${e.id}-${audioFileId}`;
+
+        return { id: uniqueId, title: titleText, summary: summaryText, audioUrl };
       });
 
       setItems(podcasts);
@@ -155,7 +158,7 @@ const MyPodcasts: React.FC = () => {
       <FlatList
         data={items}
         keyExtractor={item => item.id}
-        numColumns={2}
+        numColumns={1}
         contentContainerStyle={styles.grid}
         refreshControl={
           <RefreshControl

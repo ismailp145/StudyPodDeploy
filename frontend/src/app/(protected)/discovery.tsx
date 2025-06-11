@@ -161,7 +161,7 @@ export default function Discovery() {
               />
             )}
             keyExtractor={item => item.id}
-            numColumns={2}
+            numColumns={1}
             scrollEnabled={false}
             contentContainerStyle={styles.grid}
           />
@@ -179,7 +179,7 @@ export default function Discovery() {
               />
             )}
             keyExtractor={item => item.id}
-            numColumns={2}
+            numColumns={1}
             scrollEnabled={false}
             contentContainerStyle={styles.grid}
           />

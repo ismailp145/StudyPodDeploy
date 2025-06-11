@@ -11,7 +11,7 @@ interface PodcastProps {
 }
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = (width - 48) / 2; // 2 columns with padding
+const CARD_WIDTH = width - 32; // Full width with padding on sides
 
 const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2C2F33',
     borderRadius: 12,
     padding: 16,
-    height: '100%',
+    height: 'auto', // Changed from '100%' to 'auto' to prevent elongation
     borderWidth: 1,
     borderColor: '#40444B',
   },
