@@ -1,6 +1,8 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import PodcastPlayer from '../../components/PodcastPlayer'
+import { Redirect } from 'expo-router'
+import { AuthContext } from '@/src/utils/authContext'
 
 const Home = () => {
   const [prompt, setPrompt] = useState('')
@@ -9,7 +11,12 @@ const Home = () => {
   const [url, setUrl] = useState<string | null>(null)
   const [title, setTitle] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const { firebaseId } = useContext(AuthContext);
 
+  if (!firebaseId) {
+    return <Redirect href="/(auth)/Home" />;
+  }
+  
   const handleGenerate = async () => {
     if (!prompt.trim()) {
       return

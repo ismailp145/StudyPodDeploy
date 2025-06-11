@@ -131,6 +131,33 @@ router.get('/audio-file-by-keywords', async (req: Request, res: Response): Promi
 
     // 3️⃣  If we found one, return it; otherwise signal “not found”
     if (existing && existing.audio) {
+      
+    // 4) Find the user by their Firebase UID
+    const user = await prisma.user.findUnique({
+      where: { firebaseId }
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found for that firebaseId' });
+      return;
+    }
+        // 5) Link the audio to that user
+        await prisma.userAudioFile.create({
+          data: {
+            userId:  user.id,
+            audioId: existing.audio.id
+          }
+        });
+
+        await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          Audios: {
+            push: existing.audio.id
+          }
+        }
+      });
+
       res.json({
         id:        existing.id,
         title:     existing.title,
@@ -140,9 +167,12 @@ router.get('/audio-file-by-keywords', async (req: Request, res: Response): Promi
         audioUrl:  existing.audio.url,   // public / signed S3 URL
         s3Key:     existing.audio.s3Key,
       });
+
     } else {
       res.status(404).json({ message: 'No cached podcast found' });
     } 
+
+    
   } catch (error) {
     console.error('GET /generate-podcast error:', error);
     res.status(500).json({ error: 'Failed to look up podcast' });
