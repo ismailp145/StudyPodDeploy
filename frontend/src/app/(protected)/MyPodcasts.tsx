@@ -1,61 +1,83 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
-import PodcastPlayer from '../../components/PodcastPlayer';
-import { AuthContext } from '@/src/utils/authContext';
+// screens/MyPodcasts.tsx
 
-// Base URL for your S3 bucket
+import React, { useContext, useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
+import Podcast from '@/src/components/PodcastCard';
+import { AuthContext } from '@/src/utils/authContext';
+import axios from 'axios';
+
 const S3_BASE_URL = 'https://team5-study-pod-s3-bucket.s3.us-east-2.amazonaws.com';
 
-type AudioItem = {
+interface RawEntry {
   id: string;
-  s3Key: string;
-  url: string;
-  originalName?: string;
-};
+  audioFile: {
+    id: string;
+    s3Key: string;
+    originalName?: string;
+    uploadDate: string;
+  };
+  user: {
+    firebaseId: string;
+  };
+}
+
+interface PodcastItem {
+  id: string;
+  title: string;
+  summary: string;
+  audioUrl: string;
+}
 
 const MyPodcasts: React.FC = () => {
   const { firebaseId } = useContext(AuthContext);
-  const [audios, setAudios] = useState<AudioItem[]>([]);
+  const [items, setItems] = useState<PodcastItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchUserPodcasts = async () => {
-      try {
-        const response = await fetch('https://studypod-nvau.onrender.com/mongo/user-audio-files');
-        if (!response.ok) {
-          throw new Error(`Status: ${response.status}`);
-        }
-        const data = await response.json();
-        // Filter entries by the logged-in user's Firebase UID
-        const userEntries = (data as any[]).filter(
-          entry => entry.user.firebaseId === firebaseId
-        );
-        const audioList: AudioItem[] = userEntries.map(entry => {
-          const s3Key: string = entry.audioFile.s3Key;
-          return {
-            id: entry.audioFile.id,
-            s3Key,
-            url: `${S3_BASE_URL}/${s3Key}`,
-            originalName: entry.audioFile.originalName,
-          };
-        });
-        setAudios(audioList);
-      } catch (err) {
-        console.error('Error fetching podcasts:', err);
-        setError('Failed to load your podcasts.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchUserPodcasts = async () => {
+    if (!firebaseId) return;
+    setError(null);
+    try {
+      const resp = await axios.get<RawEntry[]>('https://studypod-nvau.onrender.com/mongo/user-audio-files');
+      const userEntries = resp.data.filter(e => e.user.firebaseId === firebaseId);
 
-    if (firebaseId) {
-      fetchUserPodcasts();
-    } else {
-      setError('User not logged in.');
+      const podcasts: PodcastItem[] = userEntries.map(e => {
+        const { id, s3Key, originalName, uploadDate } = e.audioFile;
+        const date = new Date(uploadDate).toLocaleDateString();
+        return {
+          id,
+          title: originalName ?? 'Untitled Podcast',
+          summary: `Uploaded on ${date}`,
+          audioUrl: `${S3_BASE_URL}/${s3Key}`,
+        };
+      });
+
+      setItems(podcasts);
+    } catch (err) {
+      console.error(err);
+      setError('Couldn’t load your podcasts.');
+    } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  useEffect(() => {
+    fetchUserPodcasts();
   }, [firebaseId]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchUserPodcasts();
+  };
 
   if (loading) {
     return (
@@ -73,7 +95,7 @@ const MyPodcasts: React.FC = () => {
     );
   }
 
-  if (audios.length === 0) {
+  if (items.length === 0) {
     return (
       <View style={styles.center}>
         <Text style={styles.emptyText}>You have no saved podcasts yet.</Text>
@@ -83,14 +105,25 @@ const MyPodcasts: React.FC = () => {
 
   return (
     <FlatList
-      data={audios}
-      keyExtractor={item => item.id}
-      contentContainerStyle={styles.listContainer}
+      data={items}
+      keyExtractor={i => i.id}
+      numColumns={2}
+      contentContainerStyle={styles.grid}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#5865F2']}
+          tintColor="#5865F2"
+        />
+      }
       renderItem={({ item }) => (
-        <View style={styles.podcastContainer}>
-          {item.originalName && <Text style={styles.title}>{item.originalName}</Text>}
-          <PodcastPlayer s3Url={item.url} />
-        </View>
+        <Podcast
+          id={item.id}
+          title={item.title}
+          summary={item.summary}
+          audioUrl={item.audioUrl}
+        />
       )}
     />
   );
@@ -99,29 +132,22 @@ const MyPodcasts: React.FC = () => {
 const styles = StyleSheet.create({
   center: {
     flex: 1,
+    backgroundColor: '#23272A',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#23272A',
+    padding: 20,
+  },
+  grid: {
+    padding: 8,
   },
   errorText: {
-    color: 'red',
+    color: '#ED4245',
     fontSize: 16,
+    textAlign: 'center',
   },
   emptyText: {
     color: '#FFFFFF',
     fontSize: 16,
-  },
-  listContainer: {
-    padding: 20,
-    backgroundColor: '#23272A',
-  },
-  podcastContainer: {
-    marginBottom: 24,
-  },
-  title: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    marginBottom: 8,
   },
 });
 
