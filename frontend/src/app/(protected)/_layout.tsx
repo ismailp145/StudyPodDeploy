@@ -2,12 +2,15 @@
 import { AuthContext } from "../../utils/authContext";
 import { Redirect, Tabs } from "expo-router";
 import { useContext } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Text } from "react-native";
 
 type IconName = keyof typeof MaterialCommunityIcons.glyphMap;
 
 export default function TabsLayout() {
   const { isReady, isLoggedIn } = useContext(AuthContext);
+  const insets = useSafeAreaInsets();
   if (!isReady) return null;
   if (!isLoggedIn) return <Redirect href="/(auth)/Home" />;
 
@@ -17,19 +20,17 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarActiveTintColor: "#bb86fc",
         tabBarInactiveTintColor: "#a0a0a0",
+        tabBarShowLabel: true,
+        tabBarLabelPosition: "below-icon",
         tabBarStyle: {
           backgroundColor: "#1e2124",
-          height: 80,
-          paddingTop: 8,
+          height: 74,
+          paddingBottom: insets.bottom,
           borderTopWidth: 0,
           elevation: 0,
           shadowOpacity: 0,
-          flexDirection: 'row',
-          justifyContent: 'space-around',
-          alignItems: 'center',
         },
         tabBarLabelStyle: {
-          paddingBottom: 4,
           fontSize: 12,
         },
         tabBarItemStyle: {
@@ -42,9 +43,12 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Create",
+          title: "Home",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="arch" size={size} color={color} />
+          ),
+          tabBarLabel: ({ color }) => (
+            <Text style={{ color, fontSize: 12, marginTop: 4 }}>Home</Text>
           ),
         }}
       />
@@ -55,6 +59,9 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="podcast" size={size} color={color} />
           ),
+          tabBarLabel: ({ color }) => (
+            <Text style={{ color, fontSize: 12, marginTop: 4 }}>My Playlist</Text>
+          ),
         }}
       />
       <Tabs.Screen
@@ -63,6 +70,9 @@ export default function TabsLayout() {
           title: "Explore",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="compass" size={size} color={color} />
+          ),
+          tabBarLabel: ({ color }) => (
+            <Text style={{ color, fontSize: 12, marginTop: 4 }}>Explore</Text>
           ),
         }}
       />
@@ -73,6 +83,9 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="plus-circle" size={size} color={color} />
           ),
+          tabBarLabel: ({ color }) => (
+            <Text style={{ color, fontSize: 12, marginTop: 4 }}>Create</Text>
+          ),
         }}
       />
       <Tabs.Screen
@@ -81,6 +94,9 @@ export default function TabsLayout() {
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="cog" size={size} color={color} />
+          ),
+          tabBarLabel: ({ color }) => (
+            <Text style={{ color, fontSize: 12, marginTop: 4 }}>Settings</Text>
           ),
         }}
       />
