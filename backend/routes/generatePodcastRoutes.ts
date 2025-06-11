@@ -83,7 +83,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     // 2) Create & upload audio
     const audioResult = await createAndSaveToS3AudioFile(
       parsed.content,
-      `podcast_${Date.now()}`,
+      parsed.title,
       voice
     );
 
