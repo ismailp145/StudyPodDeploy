@@ -30,6 +30,27 @@ const Search: React.FC = () => {
 
     setLoading(true);
     try {
+      if (!firebaseId) {
+        setGeneratedContent('Please log in to generate podcasts');
+        setPressed(true);
+        setLoading(false);
+        return;
+      }
+
+      const query = new URLSearchParams({ prompt, firebaseId }).toString();
+      const getRes = await fetch(
+        `https://studypod-nvau.onrender.com/mongo/audio-file-by-keywords?${query}`
+      );
+
+      if (getRes.ok) {
+        const cached = await getRes.json();
+        setGeneratedContent(cached.content);
+        setTitle(cached.title);
+        setUrl(cached.audioUrl);
+        setPressed(true);
+        return;
+      }
+
       const response = await fetch(
         'https://studypod-nvau.onrender.com/generate-podcast',
         {
@@ -42,11 +63,12 @@ const Search: React.FC = () => {
           }),
         }
       );
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const data = await response.json();
-
       setGeneratedContent(data.content);
       setTitle(data.title);
       setUrl(data.audioUrl);

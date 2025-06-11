@@ -14,7 +14,7 @@ export default function Player() {
       <Text style={styles.userIdText}>
         {firebaseId ? `User ID: ${firebaseId}` : 'Not logged in'}
       </Text>
-      <PodcastPlayer s3Url={audioURL} />
+      <PodcastPlayer s3Url={audioURL} isExpanded={true} />
     </View>
   );
 }
