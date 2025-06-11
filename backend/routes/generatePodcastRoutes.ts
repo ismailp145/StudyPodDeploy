@@ -4,6 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { PrismaClient } from '../generated/prisma';
 import { createAndSaveToS3AudioFile } from '../services/audioService';
+import { filterKeywords } from '../services/keywordService';
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -71,6 +72,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  
   try {
     // 1) Generate the text response
     const result = await geminiModel.generateContent([systemPrompt, prompt]);
