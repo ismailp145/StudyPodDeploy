@@ -99,7 +99,7 @@ const Search: React.FC = () => {
                 {generatedContent && (
                   <Text style={styles.resultText}>{generatedContent}</Text>
                 )}
-                {url && title && <PodcastPlayer s3Url={url} isExpanded={true} />}
+                {url && title && (<PodcastPlayer s3Url={url} isExpanded={true}/>)}
                 <TouchableOpacity
                   style={[styles.button, { marginTop: 20 }]}
                   onPress={() => {

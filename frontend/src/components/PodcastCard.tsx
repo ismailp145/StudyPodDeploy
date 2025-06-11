@@ -36,7 +36,7 @@ const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl }) => {
 
         {isExpanded && (
           <View style={styles.playerContainer}>
-            <PodcastPlayer s3Url={audioUrl} />
+            <PodcastPlayer s3Url={audioUrl} isExpanded={isExpanded}/>
           </View>
         )}
 
