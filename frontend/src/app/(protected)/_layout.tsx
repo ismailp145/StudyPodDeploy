@@ -13,7 +13,6 @@ export default function TabsLayout() {
 
   const iconMap: Record<string, IconName> = {
     index: "home",
-    test: "home",
     Settings: "setting",
     MyPodcasts: "sound",
     discovery: "book",
@@ -21,7 +20,6 @@ export default function TabsLayout() {
 
   const titleMap: Record<string, string> = {
     index: "Create",
-    test: "Test",
     Settings: "Settings",
     MyPodcasts: "My Playlist",
     discovery: "Explore",
@@ -52,11 +50,19 @@ export default function TabsLayout() {
             paddingTop: 8,
             borderTopWidth: 0,      // gets rid of the default hairline
             elevation: 0,           // Android shadow
-            shadowOpacity: 0, 
+            shadowOpacity: 0,
+            justifyContent: 'space-around', // Distribute items evenly
+            alignItems: 'center', // Center items vertically
           },
           tabBarLabelStyle: {
             paddingBottom: 4,
             fontSize: 12,
+          },
+          tabBarItemStyle: {
+            flex: 1, // Each item takes equal space
+            flexDirection: 'column', // Stack icon and text vertically
+            alignItems: 'center', // Center icon and text horizontally
+            paddingHorizontal: 5, // Add some horizontal padding to prevent cutoff
           },
         };
       }}
@@ -65,9 +71,8 @@ export default function TabsLayout() {
       <Tabs.Screen name="MyPodcasts" />
       <Tabs.Screen name="discovery" />
       <Tabs.Screen name="Settings" />
-      <Tabs.Screen name="Test" />
 
-      {/* if you still need “player” for deep-linking/navigation but don’t want it visible: */}
+      {/* if you still need "player" for deep-linking/navigation but don't want it visible: */}
       <Tabs.Screen
         name="player"
         options={{ tabBarButton: () => null }}
