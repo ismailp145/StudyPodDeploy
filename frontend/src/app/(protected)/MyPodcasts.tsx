@@ -43,32 +43,34 @@ const MyPodcasts: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchUserPodcasts = async () => {
-    if (!firebaseId) return;
-    setError(null);
-    try {
-      const resp = await axios.get<RawEntry[]>('https://studypod-nvau.onrender.com/mongo/user-audio-files');
-      const userEntries = resp.data.filter(e => e.user.firebaseId === firebaseId);
+  if (!firebaseId) return;
+  setError(null);
+  try {
+    const resp = await axios.get<RawEntry[]>(
+      'https://studypod-nvau.onrender.com/mongo/user-audio-files'
+    );
+    const userEntries = resp.data.filter(e => e.user.firebaseId === firebaseId);
 
-      const podcasts: PodcastItem[] = userEntries.map(e => {
-        const { id, s3Key, originalName, uploadDate } = e.audioFile;
-        const date = new Date(uploadDate).toLocaleDateString();
-        return {
-          id,
-          title: originalName ?? 'Untitled Podcast',
-          summary: `Uploaded on ${date}`,
-          audioUrl: `${S3_BASE_URL}/${s3Key}`,
-        };
-      });
+    const podcasts: PodcastItem[] = userEntries.map(e => {
+      const { id, s3Key, originalName, uploadDate } = e.audioFile;
+      const date = new Date(uploadDate).toLocaleDateString();
+      return {
+        id,
+        title: originalName ?? 'Untitled Podcast',
+        summary: `Uploaded on ${date}`,
+        audioUrl: `${S3_BASE_URL}/${s3Key}`,
+      };
+    });
 
-      setItems(podcasts);
-    } catch (err) {
-      console.error(err);
-      setError('Couldn’t load your podcasts.');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+    setItems(podcasts);
+  } catch (err) {
+    console.error(err);
+    setError('Couldn’t load your podcasts.');
+  } finally {
+    setLoading(false);
+    setRefreshing(false);
+  }
+};
 
   useEffect(() => {
     fetchUserPodcasts();
