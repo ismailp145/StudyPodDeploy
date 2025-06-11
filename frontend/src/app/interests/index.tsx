@@ -125,7 +125,6 @@ const Info = () => {
             </Text>
           </View>
 
-          <Text style={styles.title}>Welcome to StudyPod!</Text>
           <Text style={styles.subtitle}>
             Select at least {MINIMUM_INTERESTS} interests to help us personalize your learning experience
           </Text>
@@ -171,7 +170,7 @@ const Info = () => {
               <ActivityIndicator color="#fff" />
             ) : (
               <Text style={styles.submitButtonText}>
-                Continue to Your Feed
+                Continue
               </Text>
             )}
           </TouchableOpacity>

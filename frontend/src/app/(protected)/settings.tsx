@@ -1,20 +1,30 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, StatusBar } from "react-native";
 import { AuthContext } from "@/src/utils/authContext";
+import { useRouter } from "expo-router";
 
 const Settings = () => {
   const authState = useContext(AuthContext);
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.content}>
         <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>This is the settings page</Text>
+        <Text style={styles.subtitle}>Manage your account preferences</Text>
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => authState.logOut()}>
-        <Text style={styles.buttonText}>Log Out</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity 
+          style={[styles.button, styles.updateInterestsButton]} 
+          onPress={() => router.push('/interests')}
+        >
+          <Text style={styles.buttonText}>Update Interests</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={() => authState.logOut()}>
+          <Text style={styles.buttonText}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -42,12 +52,22 @@ const styles = StyleSheet.create({
     color: '#B9BBBE',
     fontSize: 16,
   },
+  buttonContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+    gap: 16,
+  },
   button: {
-    backgroundColor: '#5865F2',
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  updateInterestsButton: {
+    backgroundColor: '#5865F2',
+  },
+  logoutButton: {
+    backgroundColor: '#ED4245',
   },
   buttonText: {
     color: '#FFFFFF',
