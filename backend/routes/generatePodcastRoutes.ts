@@ -4,6 +4,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { PrismaClient } from '../generated/prisma';
 import { createAndSaveToS3AudioFile } from '../services/audioService';
+import { filterKeywords } from '../services/keywordService';
 
 dotenv.config();
 const prisma = new PrismaClient();
@@ -71,6 +72,7 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
+  
   try {
     // 1) Generate the text response
     const result = await geminiModel.generateContent([systemPrompt, prompt]);
@@ -138,6 +140,47 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       details: error instanceof Error ? error.message : 'Unknown error'
     });
   }
+});
+
+router.get('/', async (req: Request, res: Response): Promise<void> => {
+
+  const { prompt, firebaseId } = req.body;
+  if (!prompt || !firebaseId) {
+    res.status(400).json({ error: 'Both prompt and firebaseId are required' });
+    return;
+  }
+
+  // TRIM PODCAST METHOD HERE
+  // 2) Use the keywords and then check the db 
+  // 3) If the keywords are found in the db, then use the podcast summary and content
+  // 4) If the keywords are not found in the db, then continue with the normal process below
+
+  // 1) Trim the prompt into keywords 
+  try {
+  const keywords = filterKeywords(prompt);
+
+  // 2) Check the db for the keywords
+  const podcast = await prisma.podcastSummary.findMany({
+    where: {
+      keywords: {
+        hasSome: keywords
+      }
+    }
+  });
+  if (podcast.length > 0) {
+    // 3) If the keywords are found in the db, then use the podcast summary and content
+    const podcastSummary = podcast[0];
+    const podcastContent = podcastSummary.content;
+    const podcastTitle = podcastSummary.title;
+    const podcastKeywords = podcastSummary.keywords;
+  } 
+  // continue with the normal process below
+  } catch (error) {
+    console.error('Error filtering keywords:', error);
+    res.status(500).json({ error: 'Failed to filter keywords' });
+    return;
+  }
+
 });
 
 export default router;
