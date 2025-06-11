@@ -17,9 +17,11 @@ import { Redirect } from 'expo-router';
   
 const Search: React.FC = () => {
   const [prompt, setPrompt] = useState('');
-  const [selectedVoice, setSelectedVoice] = useState<string>('s3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json');
+  const [selectedVoice, setSelectedVoice] = useState<string>(
+    's3://voice-cloning-zero-shot/d9ff78ba-d016-47f6-b0ef-dd630f59414e/female-cs/manifest.json'
+  );
   const [pressed, setPressed] = useState(false);
-  const [generatedContent, setGeneratedContent] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
   const [url, setUrl] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -36,12 +38,13 @@ const Search: React.FC = () => {
     setLoading(true);
     try {
       if (!firebaseId) {
-        setGeneratedContent('Please log in to generate podcasts');
+        setSummary('Please log in to generate podcasts');
         setPressed(true);
         setLoading(false);
         return;
       }
 
+      // first try cache
       const query = new URLSearchParams({ prompt, firebaseId }).toString();
       const getRes = await fetch(
         `https://studypod-nvau.onrender.com/mongo/audio-file-by-keywords?${query}`
@@ -49,13 +52,14 @@ const Search: React.FC = () => {
 
       if (getRes.ok) {
         const cached = await getRes.json();
-        setGeneratedContent(cached.content);
         setTitle(cached.title);
         setUrl(cached.audioUrl);
+        setSummary(cached.summary);      // ← here we grab the summary
         setPressed(true);
         return;
       }
 
+      // fallback to POST generate
       const response = await fetch(
         'https://studypod-nvau.onrender.com/generate-podcast',
         {
@@ -74,13 +78,13 @@ const Search: React.FC = () => {
       }
       
       const data = await response.json();
-      setGeneratedContent(data.content);
       setTitle(data.title);
       setUrl(data.audioUrl);
+      setSummary(data.summary);          // ← and here too
       setPressed(true);
     } catch (error) {
       console.error('Error generating content:', error);
-      setGeneratedContent('Failed to generate content. Please try again.');
+      setSummary('Failed to generate summary. Please try again.');
       setPressed(true);
     } finally {
       setLoading(false);
@@ -123,16 +127,18 @@ const Search: React.FC = () => {
               <ActivityIndicator size="large" color="#5865F2" />
             ) : (
               <>
-                {generatedContent && (
-                  <Text style={styles.resultText}>{generatedContent}</Text>
+                {summary && (
+                  <Text style={styles.resultText}>{summary}</Text>  // ← show summary
                 )}
-                {url && title && (<PodcastPlayer s3Url={url} isExpanded={true}/>)}
+                {url && title && (
+                  <PodcastPlayer s3Url={url} isExpanded={true} />
+                )}
                 <TouchableOpacity
                   style={[styles.button, { marginTop: 20 }]}
                   onPress={() => {
                     setPressed(false);
                     setPrompt('');
-                    setGeneratedContent(null);
+                    setSummary(null);    // ← reset summary
                     setUrl(null);
                     setTitle(null);
                   }}
