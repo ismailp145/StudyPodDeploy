@@ -78,7 +78,7 @@ const Info = () => {
       await axios.post(`https://studypod-nvau.onrender.com/user/interests/${firebaseId}`, {
         interests: selectedInterests
       });
-      router.push("/discovery");
+      router.push("/(protected)/discovery");
     } catch (error: any) {
       console.error('Error saving interests:', {
         error: error,

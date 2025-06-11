@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from '@/firebaseConfig';
 import { AuthContext } from '@/src/utils/authContext';
@@ -22,6 +22,7 @@ export default function LogIn() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
   const { logIn } = useContext(AuthContext);
 
@@ -54,6 +55,29 @@ export default function LogIn() {
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setErrorMessage('Please enter your email address');
+      return;
+    }
+    
+    setLoading(true);
+    setErrorMessage('');
+    setSuccessMessage('');
+    
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setSuccessMessage('Password reset link has been sent to your email');
+    } catch (error: any) {
+      let msg = 'Failed to send reset email. Please try again.';
+      if (error.code === 'auth/invalid-email') msg = 'Please enter a valid email address';
+      if (error.code === 'auth/user-not-found') msg = 'No account found with this email';
+      setErrorMessage(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Back button */}
@@ -71,6 +95,13 @@ export default function LogIn() {
           <View style={styles.errorContainer}>
             <Ionicons name="alert-circle" size={20} color="#FF3B30" />
             <Text style={styles.errorText}>{errorMessage}</Text>
+          </View>
+        )}
+
+        {successMessage.length > 0 && (
+          <View style={styles.successContainer}>
+            <Ionicons name="checkmark-circle" size={20} color="#43B581" />
+            <Text style={styles.successText}>{successMessage}</Text>
           </View>
         )}
 
@@ -110,8 +141,8 @@ export default function LogIn() {
             </View>
           </View>
 
-          {/* Optional: Forgot Password link */}
-          <TouchableOpacity /* onPress={...} */>
+          {/* Forgot Password link */}
+          <TouchableOpacity onPress={handlePasswordReset}>
             <Text style={styles.forgotPassword}>Forgot Password?</Text>
           </TouchableOpacity>
 
@@ -131,7 +162,7 @@ export default function LogIn() {
 
         {/* Sign up footer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don’t have an account?</Text>
+          <Text style={styles.footerText}>Don't have an account?</Text>
           <TouchableOpacity onPress={() => router.push('/SignUp')}>
             <Text style={styles.signUpText}>Sign Up</Text>
           </TouchableOpacity>
@@ -198,4 +229,19 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   errorText: { color: '#FFF', marginLeft: 8, flex: 1, fontSize: 14 },
+  successContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#43B581',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    opacity: 0.9,
+  },
+  successText: {
+    color: '#FFF',
+    marginLeft: 8,
+    flex: 1,
+    fontSize: 14,
+  },
 });
