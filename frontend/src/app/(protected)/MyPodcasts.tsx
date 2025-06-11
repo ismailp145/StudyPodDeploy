@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import Podcast from '@/src/components/PodcastCard';
 import { AuthContext } from '@/src/utils/authContext';
 import axios from 'axios';
@@ -37,44 +38,50 @@ interface PodcastItem {
 
 const MyPodcasts: React.FC = () => {
   const { firebaseId } = useContext(AuthContext);
+  const isFocused = useIsFocused();
+
   const [items, setItems] = useState<PodcastItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchUserPodcasts = async () => {
-  if (!firebaseId) return;
-  setError(null);
-  try {
-    const resp = await axios.get<RawEntry[]>(
-      'https://studypod-nvau.onrender.com/mongo/user-audio-files'
-    );
-    const userEntries = resp.data.filter(e => e.user.firebaseId === firebaseId);
+    if (!firebaseId) return;
+    setError(null);
+    try {
+      const resp = await axios.get<RawEntry[]>(
+        'https://studypod-nvau.onrender.com/mongo/user-audio-files'
+      );
+      const userEntries = resp.data.filter(e => e.user.firebaseId === firebaseId);
 
-    const podcasts: PodcastItem[] = userEntries.map(e => {
-      const { id, s3Key, originalName, uploadDate } = e.audioFile;
-      const date = new Date(uploadDate).toLocaleDateString();
-      return {
-        id,
-        title: originalName ?? 'Untitled Podcast',
-        summary: `Uploaded on ${date}`,
-        audioUrl: `${S3_BASE_URL}/${s3Key}`,
-      };
-    });
+      const podcasts: PodcastItem[] = userEntries.map(e => {
+        const { id, s3Key, originalName, uploadDate } = e.audioFile;
+        const date = new Date(uploadDate).toLocaleDateString();
+        return {
+          id,
+          title: originalName ?? 'Untitled Podcast',
+          summary: `Uploaded on ${date}`,
+          audioUrl: `${S3_BASE_URL}/${s3Key}`,
+        };
+      });
 
-    setItems(podcasts);
-  } catch (err) {
-    console.error(err);
-    setError('Couldn’t load your podcasts.');
-  } finally {
-    setLoading(false);
-    setRefreshing(false);
-  }
-};
+      setItems(podcasts);
+    } catch (err) {
+      console.error(err);
+      setError('Couldn’t load your podcasts.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
+  // Whenever the screen gains focus (or firebaseId changes), reload
   useEffect(() => {
-    fetchUserPodcasts();
-  }, [firebaseId]);
+    if (isFocused && firebaseId) {
+      setLoading(true);
+      fetchUserPodcasts();
+    }
+  }, [isFocused, firebaseId]);
 
   const onRefresh = () => {
     setRefreshing(true);
