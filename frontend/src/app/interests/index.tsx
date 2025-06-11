@@ -75,10 +75,18 @@ const Info = () => {
     setIsSubmitting(true);
     setError(null);
     try {
-      await axios.post(`https://studypod-nvau.onrender.com/user/interests/${firebaseId}`, {
+      // Save interests and wait for the response
+      const response = await axios.post(`https://studypod-nvau.onrender.com/user/interests/${firebaseId}`, {
         interests: selectedInterests
       });
-      router.push("/(protected)/discovery");
+
+      // Only navigate after interests are successfully saved
+      if (response.status === 200) {
+        // Navigate to discovery page
+        router.push("/(protected)");
+      } else {
+        throw new Error('Failed to save interests');
+      }
     } catch (error: any) {
       console.error('Error saving interests:', {
         error: error,

@@ -37,6 +37,14 @@ interface UserAudioFileEntry {
   user: { firebaseId: string };
 }
 
+interface UserResponse {
+  user: {
+    id: string;
+    interests: string[];
+    Audios: string[];  // Array of audio IDs created by the user
+  };
+}
+
 const API_BASE_URL = 'https://studypod-nvau.onrender.com';
 
 export default function Discovery() {
@@ -61,20 +69,32 @@ export default function Discovery() {
   }, []);
 
   const fetchDiscovery = useCallback(async () => {
-    const [audioRes, userAudioRes] = await Promise.all([
+    const [audioRes, userAudioRes, userRes] = await Promise.all([
       axios.get<AudioFileResponse[]>(`${API_BASE_URL}/mongo/audio-files`),
       axios.get<UserAudioFileEntry[]>(`${API_BASE_URL}/mongo/user-audio-files`),
+      axios.get<UserResponse>(`${API_BASE_URL}/user/${firebaseId}`),
     ]);
 
+    // Convert all keywords to lowercase for case-insensitive matching
     const keywords = new Set<string>();
+    const userCreatedAudioIds = new Set(userRes.data.user.Audios);
+    
+    // Add keywords from user's listened podcasts (converted to lowercase)
     userAudioRes.data
       .filter(entry => entry.user.firebaseId === firebaseId)
       .forEach(entry =>
-        entry.audioFile.summary?.keywords.forEach(k => keywords.add(k))
+        entry.audioFile.summary?.keywords.forEach(k => keywords.add(k.toLowerCase()))
       );
 
+    // Add user's saved interests (converted to lowercase)
+    userRes.data.user.interests.forEach(interest => keywords.add(interest.toLowerCase()));
+
     const matched = audioRes.data.filter(
-      file => file.summary?.keywords.some(k => keywords.has(k))
+      file => 
+        // Match keywords but exclude user-created podcasts
+        // Convert podcast keywords to lowercase for case-insensitive matching
+        file.summary?.keywords.some(k => keywords.has(k.toLowerCase())) && 
+        !userCreatedAudioIds.has(file.id)
     );
 
     return matched.map(file => ({
