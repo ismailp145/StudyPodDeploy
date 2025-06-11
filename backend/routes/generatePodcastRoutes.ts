@@ -65,7 +65,7 @@ const systemPrompt = `
 const router: Router = express.Router();
 
 router.post('/', async (req: Request, res: Response): Promise<void> => {
-  const { prompt, firebaseId } = req.body;
+  const { prompt, firebaseId, voice } = req.body;
   if (!prompt || !firebaseId) {
     res.status(400).json({ error: 'Both prompt and firebaseId are required' });
     return;
@@ -81,7 +81,8 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     // 2) Create & upload audio
     const audioResult = await createAndSaveToS3AudioFile(
       parsed.content,
-      `podcast_${Date.now()}`
+      `podcast_${Date.now()}`,
+      voice
     );
 
     // 3) Save the PodcastSummary linked to that AudioFile
