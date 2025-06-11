@@ -12,16 +12,16 @@ export default function TabsLayout() {
   if (!isLoggedIn) return <Redirect href="/(auth)/Home" />;
 
   const iconMap: Record<string, IconName> = {
-    index: "home",
-    search: "search1",
+    Home: "home",
+    test: "home",
     Settings: "setting",
     MyPodcasts: "sound",
-    discovery: "question",
+    discovery: "book",
   };
 
   const titleMap: Record<string, string> = {
     index: "Home",
-    search: "Search",
+    test: "Test",
     Settings: "Settings",
     MyPodcasts: "My Podcasts",
     discovery: "Discovery",
@@ -61,12 +61,11 @@ export default function TabsLayout() {
         };
       }}
     >
-      {/* only these five will show up as tabs */}
-      <Tabs.Screen name="index" />
-      <Tabs.Screen name="search" />
-      <Tabs.Screen name="Settings" />
+      <Tabs.Screen name="Home" />
       <Tabs.Screen name="MyPodcasts" />
       <Tabs.Screen name="discovery" />
+      <Tabs.Screen name="Settings" />
+      <Tabs.Screen name="Test" />
 
       {/* if you still need “player” for deep-linking/navigation but don’t want it visible: */}
       <Tabs.Screen

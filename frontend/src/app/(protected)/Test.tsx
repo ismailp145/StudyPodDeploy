@@ -4,7 +4,7 @@ import PodcastPlayer from '../../components/PodcastPlayer'
 import { Redirect } from 'expo-router'
 import { AuthContext } from '@/src/utils/authContext'
 
-const Home = () => {
+const Test = () => {
   const [prompt, setPrompt] = useState('')
   const [pressed, setPressed] = useState(false)
   const [generatedContent, setGeneratedContent] = useState<string | null>(null)
@@ -169,4 +169,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default Home
+export default Test
