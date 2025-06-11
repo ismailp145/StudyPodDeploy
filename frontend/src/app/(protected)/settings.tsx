@@ -10,7 +10,7 @@ const Settings = () => {
       <StatusBar barStyle="light-content" />
       <View style={styles.content}>
         <Text style={styles.title}>Settings</Text>
-        <Text style={styles.subtitle}>This is the settings page.</Text>
+        <Text style={styles.subtitle}>This is the settings page</Text>
       </View>
       <TouchableOpacity style={styles.button} onPress={() => authState.logOut()}>
         <Text style={styles.buttonText}>Log Out</Text>
