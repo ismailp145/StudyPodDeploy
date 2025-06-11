@@ -6,11 +6,14 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import Podcast from '@/src/components/PodcastCard';
 import { AuthContext } from '@/src/utils/authContext';
 import axios from 'axios';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const S3_BASE_URL = 'https://team5-study-pod-s3-bucket.s3.us-east-2.amazonaws.com';
 
@@ -80,7 +83,7 @@ const MyPodcasts: React.FC = () => {
       setItems(podcasts);
     } catch (err) {
       console.error(err);
-      setError('Couldn’t load your podcasts.');
+      setError("Couldn't load your podcasts");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -103,21 +106,53 @@ const MyPodcasts: React.FC = () => {
   if (loading || error || items.length === 0) {
     return (
       <View style={styles.container}>
-        {loading && (
-          <ActivityIndicator size="large" color="#5865F2" />
-        )}
-        {error && <Text style={styles.errorText}>{error}</Text>}
-        {!loading && !error && items.length === 0 && (
-          <Text style={styles.emptyText}>
-            You have no saved podcasts yet.
-          </Text>
-        )}
+        <StatusBar barStyle="light-content" />
+        <LinearGradient
+          colors={['#23272A', '#2C2F33']}
+          style={styles.headerGradient}
+        >
+          <Text style={styles.headerTitle}>My Playlist</Text>
+          <Text style={styles.headerSubtitle}>Your personal podcast collection</Text>
+        </LinearGradient>
+        <View style={styles.contentContainer}>
+          {loading && (
+            <View style={styles.centerContent}>
+              <ActivityIndicator size="large" color="#5865F2" />
+              <Text style={styles.loadingText}>Loading your podcasts...</Text>
+            </View>
+          )}
+          {error && (
+            <View style={styles.centerContent}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          )}
+          {!loading && !error && items.length === 0 && (
+            <View style={styles.centerContent}>
+              <Text style={styles.emptyText}>
+                Your podcast collection is empty
+              </Text>
+              <Text style={styles.emptySubtext}>
+                Create your first podcast to get started!
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      <LinearGradient
+        colors={['#23272A', '#2C2F33']}
+        style={styles.headerGradient}
+      >
+        <Text style={styles.headerTitle}>Let&apos;s get to listening!</Text>
+        <Text style={styles.headerSubtitle}>
+          {items.length} {items.length === 1 ? 'podcast' : 'podcasts'} in your library
+        </Text>
+      </LinearGradient>
       <FlatList
         data={items}
         keyExtractor={item => item.id}
@@ -147,22 +182,70 @@ const MyPodcasts: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#23272A',
   },
+  headerGradient: {
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#B9BBBE',
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 20,
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
   grid: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
+    paddingTop: 20,
     paddingBottom: 16,
   },
   errorText: {
     color: '#ED4245',
-    fontSize: 16,
+    fontSize: 18,
     textAlign: 'center',
+    fontWeight: '600',
   },
   emptyText: {
     color: '#FFFFFF',
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    color: '#B9BBBE',
     fontSize: 16,
     textAlign: 'center',
+  },
+  loadingText: {
+    color: '#B9BBBE',
+    fontSize: 16,
+    marginTop: 12,
   },
 });
 
