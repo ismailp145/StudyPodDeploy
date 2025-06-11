@@ -52,11 +52,16 @@ const Index: React.FC = () => {
 
       if (getRes.ok) {
         const cached = await getRes.json();
-        setTitle(cached.title);
-        setUrl(cached.audioUrl);
-        setSummary(cached.summary);      // ← here we grab the summary
-        setPressed(true);
-        return;
+        // Only use cached podcast if it was created by a different user
+        if (cached.firebaseId !== firebaseId) {
+          setTitle(cached.title);
+          setUrl(cached.audioUrl);
+          setSummary(cached.summary);
+          setPressed(true);
+          setLoading(false);
+          return;
+        }
+        // If it's the user's own podcast, continue to generate a new one
       }
 
       // fallback to POST generate
