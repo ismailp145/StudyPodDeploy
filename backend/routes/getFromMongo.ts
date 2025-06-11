@@ -72,11 +72,13 @@ router.get('/podcast-summaries', async (_req: Request, res: Response) => {
 router.get('/user-audio-files', async (_req: Request, res: Response) => {
   try {
     const entries = await prisma.userAudioFile.findMany({
-      include: {
-        user: true,
-        audioFile: true
-      }
-    });
+  include: {
+    audioFile: {
+      include: { summary: true },
+    },
+    user: true
+  }
+});
     res.json(entries);
   } catch (err: any) {
     console.error(err);

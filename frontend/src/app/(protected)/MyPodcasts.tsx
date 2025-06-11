@@ -23,6 +23,14 @@ interface RawEntry {
     s3Key: string;
     originalName?: string;
     uploadDate: string;
+    // ← pull in the 1:1 PodcastSummary relation
+    summary?: {
+      id: string;
+      title: string;
+      content: string;
+      summary: string;
+      keywords: string[];
+    };
   };
   user: {
     firebaseId: string;
@@ -48,20 +56,34 @@ const MyPodcasts: React.FC = () => {
   const fetchUserPodcasts = async () => {
     if (!firebaseId) return;
     setError(null);
+
     try {
       const resp = await axios.get<RawEntry[]>(
-        'https://studypod-nvau.onrender.com/mongo/user-audio-files'
+        'https://studypod-nvau.onrender.com/mongo/user-audio-files',
+        {
+          // tell Prisma to include the summary relation
+          params: { includeSummary: true } 
+        }
       );
+
+      // filter down to only this user
       const userEntries = resp.data.filter(e => e.user.firebaseId === firebaseId);
 
       const podcasts: PodcastItem[] = userEntries.map(e => {
-        const { id, s3Key, originalName, uploadDate } = e.audioFile;
+        const { id, s3Key, originalName, uploadDate, summary: sum } = e.audioFile;
+        // human‐readable upload date
         const date = new Date(uploadDate).toLocaleDateString();
+
+        // use the generated title/summary if present
+        const titleText    = sum?.title    ?? originalName ?? 'Untitled Podcast';
+        const summaryText  = sum?.summary  ?? `Uploaded on ${date}`;
+        const audioUrl     = `${S3_BASE_URL}/${s3Key}`;
+
         return {
           id,
-          title: originalName ?? 'Untitled Podcast',
-          summary: `Uploaded on ${date}`,
-          audioUrl: `${S3_BASE_URL}/${s3Key}`,
+          title:   titleText,
+          summary: summaryText,
+          audioUrl,
         };
       });
 
@@ -75,7 +97,7 @@ const MyPodcasts: React.FC = () => {
     }
   };
 
-  // Whenever the screen gains focus (or firebaseId changes), reload
+  // reload on focus or login
   useEffect(() => {
     if (isFocused && firebaseId) {
       setLoading(true);
