@@ -25,6 +25,7 @@ const Index: React.FC = () => {
   const [url, setUrl] = useState<string | null>(null);
   const [title, setTitle] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const { firebaseId } = useContext(AuthContext);
 
@@ -59,6 +60,8 @@ const Index: React.FC = () => {
           setSummary(cached.summary);
           setPressed(true);
           setLoading(false);
+          setShowSuccess(true);
+          setTimeout(() => setShowSuccess(false), 5000);
           return;
         }
         // If it's the user's own podcast, continue to generate a new one
@@ -85,8 +88,11 @@ const Index: React.FC = () => {
       const data = await response.json();
       setTitle(data.title);
       setUrl(data.audioUrl);
-      setSummary(data.summary);          // ← and here too
+      setSummary(data.summary);
       setPressed(true);
+      setShowSuccess(true);
+      // Hide success message after 3 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
     } catch (error) {
       console.error('Error generating content:', error);
       setSummary('Failed to generate summary. Please try again.');
@@ -101,6 +107,11 @@ const Index: React.FC = () => {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      {showSuccess && (
+        <View style={styles.successContainer}>
+          <Text style={styles.successText}>Podcast saved to your playlist!</Text>
+        </View>
+      )}
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         keyboardShouldPersistTaps="handled"
@@ -122,8 +133,19 @@ const Index: React.FC = () => {
               onVoiceSelect={setSelectedVoice}
               selectedVoice={selectedVoice}
             />
-            <TouchableOpacity style={styles.button} onPress={handleGenerate}>
-              <Text style={styles.buttonText}>Generate Podcast</Text>
+            <TouchableOpacity 
+              style={[styles.button, loading && styles.buttonDisabled]} 
+              onPress={handleGenerate}
+              disabled={loading}
+            >
+              {loading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="small" color="#FFFFFF" />
+                  <Text style={[styles.buttonText, styles.loadingText]}>Generating Podcast...</Text>
+                </View>
+              ) : (
+                <Text style={styles.buttonText}>Generate Podcast</Text>
+              )}
             </TouchableOpacity>
           </View>
         ) : (
@@ -148,7 +170,7 @@ const Index: React.FC = () => {
                     setTitle(null);
                   }}
                 >
-                  <Text style={styles.buttonText}>Start a New Podcast</Text>
+                  <Text style={styles.buttonText}>Generate a New Podcast</Text>
                 </TouchableOpacity>
               </>
             )}
@@ -218,6 +240,59 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 24,
     marginBottom: 16,
+  },
+  buttonDisabled: {
+    backgroundColor: '#4E5D94',
+    opacity: 0.8,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  loadingText: {
+    marginLeft: 8,
+  },
+  loadingStateContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  loadingStateText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  loadingStateSubtext: {
+    color: '#B9BBBE',
+    fontSize: 14,
+  },
+  successContainer: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: '#43B581',
+    padding: 16,
+    borderRadius: 8,
+    zIndex: 1000,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  successText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 
