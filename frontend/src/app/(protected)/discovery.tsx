@@ -178,12 +178,14 @@ export default function Discovery() {
           <FlatList
             data={initialPodcasts}
             renderItem={({ item }) => (
-              <Podcast
-                id={item.id}
-                title={item.title}
-                summary={item.summary}
-                audioUrl={item.audioUrl}
-              />
+              <View style={styles.podcastContainer}>
+                <Podcast
+                  id={item.id}
+                  title={item.title}
+                  summary={item.summary}
+                  audioUrl={item.audioUrl}
+                />
+              </View>
             )}
             keyExtractor={item => item.id}
             numColumns={1}
@@ -196,12 +198,14 @@ export default function Discovery() {
           <FlatList
             data={discoveryPodcasts}
             renderItem={({ item }) => (
-              <Podcast
-                id={item.id}
-                title={item.title}
-                summary={item.summary}
-                audioUrl={item.audioUrl}
-              />
+              <View style={styles.podcastContainer}>
+                <Podcast
+                  id={item.id}
+                  title={item.title}
+                  summary={item.summary}
+                  audioUrl={item.audioUrl}
+                />
+              </View>
             )}
             keyExtractor={item => item.id}
             numColumns={1}
@@ -247,9 +251,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#B9BBBE',
   },
-  section: { marginBottom: 24 },
-  sectionTitle: { padding: 20, fontSize: 24, fontWeight: '600', color: '#FFF' },
-  grid: { paddingHorizontal: 8 },
+  section: { 
+    marginBottom: 24,
+    width: '100%',
+  },
+  sectionTitle: { 
+    padding: 20, 
+    fontSize: 24, 
+    fontWeight: '600', 
+    color: '#FFF',
+    width: '100%',
+  },
+  grid: { 
+    paddingHorizontal: 8,
+    width: '100%',
+  },
+  podcastContainer: {
+    width: '100%',
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    position: 'relative',
+  },
   centered: {
     flex: 1,
     justifyContent: 'center',

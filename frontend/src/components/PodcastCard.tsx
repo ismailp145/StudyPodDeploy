@@ -3,18 +3,39 @@ import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-nati
 import { MaterialIcons } from '@expo/vector-icons';
 import PodcastPlayer from './PodcastPlayer';
 
+
 interface PodcastProps {
   id: string;
   title: string;
   summary: string;
   audioUrl: string;
+  deleteButton?: boolean;
+  onDelete?: (isPressed: boolean) => void;
+  onDeleteCancel?: () => void;
 }
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32; // Full width with padding on sides
 
-const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl }) => {
+const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteButton = false, onDelete, onDeleteCancel }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isPressed, setIsPressed] = useState(false);
+
+  const handleDelete = () => {
+    const newPressedState = true;
+    setIsPressed(newPressedState);
+    if (onDelete) {
+      onDelete(newPressedState);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    const newPressedState = false;
+    setIsPressed(newPressedState);
+    if (onDeleteCancel) {
+      onDeleteCancel();
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -28,6 +49,11 @@ const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl }) => {
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
+          {deleteButton && (
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+              <MaterialIcons name="delete" size={24} color="#ED4245" />
+            </TouchableOpacity>
+          )}
         </View>
 
         <Text style={styles.summary} numberOfLines={isExpanded ? undefined : 2}>
@@ -91,6 +117,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 'auto',
     paddingTop: 8,
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
   },
 });
 

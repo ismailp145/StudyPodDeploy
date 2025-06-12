@@ -65,7 +65,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="discovery"
+        name="Discovery"
         options={{
           title: "Explore",
           tabBarIcon: ({ color, size }) => (
@@ -77,7 +77,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="settings"
+        name="Settings"
         options={{
           title: "Settings",
           tabBarIcon: ({ color, size }) => (
