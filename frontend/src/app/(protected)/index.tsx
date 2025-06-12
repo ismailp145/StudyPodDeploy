@@ -145,7 +145,7 @@ const Index: React.FC = () => {
                     </Text>
                   </View>
                 ) : (
-                  <Text style={styles.buttonText}>Generate Podcast</Text>
+                  <Text style={styles.buttonText}>Create a Podcast</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -190,7 +190,7 @@ const Index: React.FC = () => {
                       setIsCached(false);
                     }}
                   >
-                    <Text style={styles.buttonText}>Generate a New Podcast</Text>
+                    <Text style={styles.buttonText}>New Idea?</Text>
                   </TouchableOpacity>
                 </>
               )}
