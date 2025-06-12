@@ -7,10 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   StatusBar,
-  Platform,
   SafeAreaView,
-  Alert,
-  TouchableOpacity,
   TextInput,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
@@ -18,7 +15,7 @@ import Podcast from '@/src/components/PodcastCard';
 import { AuthContext } from '@/src/utils/authContext';
 import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons } from '@expo/vector-icons';
+
 
 const S3_BASE_URL = 'https://team5-study-pod-s3-bucket.s3.us-east-2.amazonaws.com';
 

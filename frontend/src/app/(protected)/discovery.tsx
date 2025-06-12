@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   RefreshControl,
   StatusBar,
-  Platform,
   SafeAreaView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
