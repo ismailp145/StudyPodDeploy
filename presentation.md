@@ -23,8 +23,10 @@
 | Step  | Demo Action & Speaker                                         | Behind-the-Scenes Technical Highlights                                                                                                      |
 | ----- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **1** | **Log In (Ismail)** – Firebase auth                 | Firebase Auth SDK with email/password |
-| **2** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |
+| **2** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |\
+         
 | **3** | **Discovery Page (Fahad)**                                    | Server joins `audioFiles` + `summary.keywords` against interests; lazy-loads waveform thumbnails                                            |
+         Talk about searching and generating podcast (Yousef) 
 | **4** | **Custom Prompt (Ismail)** – “Explain CRISPR in simple terms” | ⚙️ **Keyword Parser** (winkNLP) extracts nouns → fast DB lookup; if hit, we stream existing audio                                           |
 | **5** | **Fallback Generation (Yousef)** – Tap *Generate*             | ① Gemini returns `{title, content, summary, keywords}` ② Text cached, keywords re-indexed ③ PlayHT converts to realistic voice (selected ↓) |
 | **6** | **Audio Quality Choice (Fahad)** – Standard vs HQ voice       | Passes `voiceId` & `format` in PlayHT request; \~15 s synthesis; progress bar via SSE                                                       |
