@@ -22,6 +22,7 @@
 
 | Step  | Demo Action & Speaker                                         | Behind-the-Scenes Technical Highlights                                                                                                      |
 | ----- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | **Talk about S3 and Prisma set up (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |
 | **1** | **Log In (Ismail)** – Firebase auth                 | Firebase Auth SDK with email/password |
 | **2** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |
 | **10** | **How search adn generate works  (Yousef)**              | Backend checks user’s history → serves next best match (complexity: deterministic conflict resolution)                                          |
