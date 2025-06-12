@@ -13,7 +13,6 @@ const TextToSpeech: React.FC<TextToSpeechProps> = ({ text }) => {
   const [selectedVoice, setSelectedVoice] = useState<string | null>(null);
   const [speaking, setSpeaking] = useState(false);
 
-  // Load available voices on mount
   useEffect(() => {
     (async () => {
       const available = await Speech.getAvailableVoicesAsync();

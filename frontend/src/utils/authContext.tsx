@@ -2,7 +2,6 @@ import React, { createContext, PropsWithChildren, useEffect, useState } from 're
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SplashScreen, useRouter } from 'expo-router';
 
-// Prevent splash until auth state is ready
 SplashScreen.preventAutoHideAsync();
 
 type StoredAuth = {

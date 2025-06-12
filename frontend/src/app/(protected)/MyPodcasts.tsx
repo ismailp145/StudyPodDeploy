@@ -16,8 +16,8 @@ import { AuthContext } from '@/src/utils/authContext';
 import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 
-
-const S3_BASE_URL = 'https://team5-study-pod-s3-bucket.s3.us-east-2.amazonaws.com';
+const S3_BASE_URL =
+  'https://team5-study-pod-s3-bucket.s3.us-east-2.amazonaws.com';
 
 interface RawEntry {
   id: string;
@@ -46,7 +46,6 @@ interface PodcastItem {
   audioUrl: string;
 }
 
-
 const MyPodcasts: React.FC = () => {
   const { firebaseId } = useContext(AuthContext);
   const isFocused = useIsFocused();
@@ -55,13 +54,11 @@ const MyPodcasts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchUserPodcasts = async () => {
     if (!firebaseId) return;
     setError(null);
-
     try {
       const resp = await axios.get<RawEntry[]>(
         'https://studypod-nvau.onrender.com/mongo/user-audio-files',
@@ -69,22 +66,24 @@ const MyPodcasts: React.FC = () => {
       );
 
       const userEntries = resp.data.filter(
-        e => e.user.firebaseId === firebaseId
+        (e) => e.user.firebaseId === firebaseId
       );
 
-      const podcasts: PodcastItem[] = userEntries.map(e => {
-        const { id: audioFileId, s3Key, originalName, uploadDate, summary: sum } =
-          e.audioFile;
+      const podcasts: PodcastItem[] = userEntries.map((e) => {
+        const {
+          id: audioFileId,
+          s3Key,
+          originalName,
+          uploadDate,
+          summary: sum,
+        } = e.audioFile;
         const date = new Date(uploadDate).toLocaleDateString();
 
         const titleText = sum?.title ?? originalName ?? 'Untitled Podcast';
-        const summaryText =
-          sum?.summary ?? `Uploaded on ${date}`;
+        const summaryText = sum?.summary ?? `Uploaded on ${date}`;
         const audioUrl = `${S3_BASE_URL}/${s3Key}`;
 
-        // Create a unique ID by combining entry ID and audio file ID
         const uniqueId = `${e.id}-${audioFileId}`;
-
         return { id: uniqueId, title: titleText, summary: summaryText, audioUrl };
       });
 
@@ -98,6 +97,11 @@ const MyPodcasts: React.FC = () => {
     }
   };
 
+  // refresh helper
+  const refreshPodcasts = () => {
+    setLoading(true);
+    fetchUserPodcasts();
+  };
 
   useEffect(() => {
     if (isFocused && firebaseId) {
@@ -111,13 +115,10 @@ const MyPodcasts: React.FC = () => {
     fetchUserPodcasts();
   };
 
-
-  // Filtered podcasts based on search query
-  const filteredPodcasts = items.filter(podcast =>
+  const filteredPodcasts = items.filter((podcast) =>
     podcast.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // unified container for all states
   if (loading || error || items.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
@@ -127,13 +128,17 @@ const MyPodcasts: React.FC = () => {
           style={styles.headerGradient}
         >
           <Text style={styles.headerTitle}>My Playlist</Text>
-          <Text style={styles.headerSubtitle}>Your personal podcast collection</Text>
+          <Text style={styles.headerSubtitle}>
+            Your personal podcast collection
+          </Text>
         </LinearGradient>
         <View style={styles.contentContainer}>
           {loading && (
             <View style={styles.centerContent}>
               <ActivityIndicator size="large" color="#5865F2" />
-              <Text style={styles.loadingText}>Loading your podcasts...</Text>
+              <Text style={styles.loadingText}>
+                Loading your podcasts...
+              </Text>
             </View>
           )}
           {error && (
@@ -164,7 +169,9 @@ const MyPodcasts: React.FC = () => {
         style={styles.headerGradient}
       >
         <Text style={styles.headerTitle}>My Playlist</Text>
-        <Text style={styles.headerSubtitle}>Your personal podcast collection</Text>
+        <Text style={styles.headerSubtitle}>
+          Your personal podcast collection
+        </Text>
       </LinearGradient>
       <View style={styles.searchContainer}>
         <TextInput
@@ -177,7 +184,7 @@ const MyPodcasts: React.FC = () => {
       </View>
       <FlatList
         data={filteredPodcasts}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id}
         numColumns={1}
         contentContainerStyle={styles.grid}
         refreshControl={
@@ -196,14 +203,19 @@ const MyPodcasts: React.FC = () => {
               summary={item.summary}
               audioUrl={item.audioUrl}
               deleteButton={true}
+              onDelete={refreshPodcasts}
             />
           </View>
         )}
-        ListEmptyComponent={!loading && !error && items.length > 0 && filteredPodcasts.length === 0 ? (
-          <View style={styles.centerContent}>
-            <Text style={styles.emptyText}>No podcasts found matching your search.</Text>
-          </View>
-        ) : null}
+        ListEmptyComponent={
+          !loading && !error && items.length > 0 && filteredPodcasts.length === 0 ? (
+            <View style={styles.centerContent}>
+              <Text style={styles.emptyText}>
+                No podcasts found matching your search.
+              </Text>
+            </View>
+          ) : null
+        }
       />
     </SafeAreaView>
   );
@@ -221,10 +233,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -284,20 +293,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#2C2F33',
     borderRadius: 8,
     padding: 12,
-    marginRight: 16,
     color: '#FFFFFF',
     fontSize: 16,
     marginTop: 12,
   },
   podcastContainer: {
-    // flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 12,
     position: 'relative',
-  },
-  deleteButton: {
-    padding: 8,
-    marginLeft: 8,
   },
 });
 

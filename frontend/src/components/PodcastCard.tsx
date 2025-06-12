@@ -5,38 +5,45 @@ import PodcastPlayer from './PodcastPlayer';
 import axios from 'axios';
 import { AuthContext } from '../utils/authContext';
 
-
 interface PodcastProps {
   id: string;
   title: string;
   summary: string;
   audioUrl: string;
   deleteButton?: boolean;
-
-
+  /** Called after a successful delete so parent can refresh */
+  onDelete?: () => void;
 }
 
 const { width } = Dimensions.get('window');
-const CARD_WIDTH = width - 32; 
+const CARD_WIDTH = width - 32;
 
-const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteButton = false  }) => {
+const Podcast: React.FC<PodcastProps> = ({
+  id,
+  title,
+  summary,
+  audioUrl,
+  deleteButton = false,
+  onDelete,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { firebaseId } = useContext(AuthContext); 
+  const { firebaseId } = useContext(AuthContext);
 
   const handleDelete = async () => {
     if (!firebaseId) {
-       Alert.alert('Not signed in');
-       return;
-      }
+      Alert.alert('Not signed in');
+      return;
+    }
     const audioId = id.substring(id.indexOf('-') + 1);
-    
+
     try {
-      await axios.delete(`https://studypod-nvau.onrender.com/user/${firebaseId}/playlist/${audioId}`);
+      await axios.delete(
+        `https://studypod-nvau.onrender.com/user/${firebaseId}/playlist/${audioId}`
+      );
+      onDelete?.();
     } catch (error) {
       console.error('Error deleting podcast:', error);
-        console.log(audioId);
-        console.log(firebaseId);
-
+      console.log(audioId, firebaseId);
     }
   };
 
@@ -46,7 +53,7 @@ const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteB
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.card}
         onPress={() => setIsExpanded(!isExpanded)}
         activeOpacity={0.7}
@@ -69,15 +76,15 @@ const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteB
 
         {isExpanded && (
           <View style={styles.playerContainer}>
-            <PodcastPlayer s3Url={audioUrl} isExpanded={isExpanded}/>
+            <PodcastPlayer s3Url={audioUrl} isExpanded={isExpanded} />
           </View>
         )}
 
         <View style={styles.footer}>
-          <MaterialIcons 
-            name={isExpanded ? "expand-less" : "expand-more"} 
-            size={24} 
-            color="#B9BBBE" 
+          <MaterialIcons
+            name={isExpanded ? 'expand-less' : 'expand-more'}
+            size={24}
+            color="#B9BBBE"
           />
         </View>
       </TouchableOpacity>
@@ -132,3 +139,4 @@ const styles = StyleSheet.create({
 });
 
 export default Podcast;
+

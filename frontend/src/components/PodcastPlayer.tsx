@@ -4,7 +4,6 @@ import { Audio, AVPlaybackStatus } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 
-const { width } = Dimensions.get('window');
 
 const PLAYBACK_SPEEDS = [0.5, 1, 1.5, 2];
 
