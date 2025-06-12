@@ -9,6 +9,7 @@ import {
   StatusBar,
   Platform,
   SafeAreaView,
+  TextInput,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
 import Podcast from '@/src/components/PodcastCard';
@@ -53,6 +54,7 @@ const MyPodcasts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const fetchUserPodcasts = async () => {
     if (!firebaseId) return;
@@ -106,6 +108,11 @@ const MyPodcasts: React.FC = () => {
     fetchUserPodcasts();
   };
 
+  // Filtered podcasts based on search query
+  const filteredPodcasts = items.filter(podcast =>
+    podcast.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   // unified container for all states
   if (loading || error || items.length === 0) {
     return (
@@ -155,8 +162,17 @@ const MyPodcasts: React.FC = () => {
         <Text style={styles.headerTitle}>My Playlist</Text>
         <Text style={styles.headerSubtitle}>Your personal podcast collection</Text>
       </LinearGradient>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by title..."
+          placeholderTextColor="#72767D"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
       <FlatList
-        data={items}
+        data={filteredPodcasts}
         keyExtractor={item => item.id}
         numColumns={1}
         contentContainerStyle={styles.grid}
@@ -176,6 +192,11 @@ const MyPodcasts: React.FC = () => {
             audioUrl={item.audioUrl}
           />
         )}
+        ListEmptyComponent={!loading && !error && items.length > 0 && filteredPodcasts.length === 0 ? (
+          <View style={styles.centerContent}>
+            <Text style={styles.emptyText}>No podcasts found matching your search.</Text>
+          </View>
+        ) : null}
       />
     </SafeAreaView>
   );
@@ -205,7 +226,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#FFFFFF',
-    marginBottom: 4,
+    marginBottom: 5,
   },
   headerSubtitle: {
     fontSize: 16,
@@ -213,41 +234,54 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
   },
   centerContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  grid: {
-    paddingHorizontal: 12,
-    paddingTop: 20,
-    paddingBottom: 16,
-  },
-  errorText: {
-    color: '#ED4245',
-    fontSize: 18,
-    textAlign: 'center',
-    fontWeight: '600',
-  },
-  emptyText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    textAlign: 'center',
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    color: '#B9BBBE',
-    fontSize: 16,
-    textAlign: 'center',
   },
   loadingText: {
     color: '#B9BBBE',
+    marginTop: 10,
     fontSize: 16,
-    marginTop: 12,
+  },
+  errorText: {
+    color: '#FF3B30',
+    marginTop: 10,
+    fontSize: 16,
+  },
+  emptyText: {
+    color: '#B9BBBE',
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  emptySubtext: {
+    color: '#72767D',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  grid: {
+    paddingHorizontal: 8,
+    paddingBottom: 20,
+  },
+  searchContainer: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: '#23272A',
+  },
+  searchInput: {
+    backgroundColor: '#2C2F33',
+    borderRadius: 8,
+    padding: 12,
+    marginRight: 16,
+    color: '#FFFFFF',
+    fontSize: 16,
+    borderColor: '#40444B',
+    borderWidth: 1,
   },
 });
 
