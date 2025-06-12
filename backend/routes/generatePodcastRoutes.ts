@@ -72,7 +72,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     return;
   }
 
-  
   try {
     const result = await geminiModel.generateContent([systemPrompt, prompt]);
     const raw = result.response.text();
@@ -114,14 +113,14 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     });
 
     await prisma.user.update({
-    where: { id: user.id },
-    data: {
-      Audios: {
-        push: audioResult.audioFileId
+      where: { id: user.id },
+      data: {
+        Audios: {
+          push: audioResult.audioFileId
+        }
       }
-    }
-  });
-  
+    });
+
     res.json({
       ...parsed,
       id:       savedSummary.id,
@@ -129,7 +128,13 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       s3Key:    audioResult.s3Key
     });
   } catch (error) {
-    console.error('Generation error:', error);
+    console.error(`[${new Date().toISOString()}] [generatePodcast] Unexpected error processing request:`, {
+      prompt,
+      firebaseId,
+      voice,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      stack:        error instanceof Error ? error.stack   : undefined,
+    });
     res.status(500).json({
       error:   'Failed to generate podcast content',
       details: error instanceof Error ? error.message : 'Unknown error'
