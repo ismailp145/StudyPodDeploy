@@ -29,7 +29,6 @@ const Index: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // NEW: track when we're showing a cached result
   const [isCached, setIsCached] = useState(false);
 
   const { firebaseId } = useContext(AuthContext);
@@ -44,7 +43,6 @@ const Index: React.FC = () => {
     setIsCached(false);
 
     try {
-      // if not forcing new, try to fetch from cache
       if (!forceNew) {
         const query = new URLSearchParams({ prompt, firebaseId }).toString();
         const getRes = await fetch(
@@ -52,7 +50,6 @@ const Index: React.FC = () => {
         );
         if (getRes.ok) {
           const cached = await getRes.json();
-          // Only use cached if it came from someone else
           if (cached.firebaseId !== firebaseId) {
             setTitle(cached.title);
             setUrl(cached.audioUrl);
@@ -155,7 +152,6 @@ const Index: React.FC = () => {
                 <ActivityIndicator size="large" color="#5865F2" />
               ) : (
                 <>
-                  {/* show cached label + button when appropriate */}
                   {isCached && (
                     <>
                       <Text style={styles.cachedLabel}>
@@ -299,7 +295,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  // NEW style for cached-label
   cachedLabel: {
     color: '#B9BBBE',
     fontSize: 14,
