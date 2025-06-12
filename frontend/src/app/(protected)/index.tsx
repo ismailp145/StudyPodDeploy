@@ -29,47 +29,42 @@ const Index: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
+  const [isCached, setIsCached] = useState(false);
+
   const { firebaseId } = useContext(AuthContext);
 
   if (!firebaseId) {
     return <Redirect href="/(auth)/Home" />;
   }
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (forceNew: boolean = false) => {
     if (!prompt.trim()) return;
-
     setLoading(true);
+    setIsCached(false);
+
     try {
-      if (!firebaseId) {
-        setSummary('Please log in to generate podcasts');
-        setPressed(true);
-        setLoading(false);
-        return;
-      }
-
-      // first try cache
-      const query = new URLSearchParams({ prompt, firebaseId }).toString();
-      const getRes = await fetch(
-        `https://studypod-nvau.onrender.com/mongo/audio-file-by-keywords?${query}`
-      );
-
-      if (getRes.ok) {
-        const cached = await getRes.json();
-        // Only use cached podcast if it was created by a different user
-        if (cached.firebaseId !== firebaseId) {
-          setTitle(cached.title);
-          setUrl(cached.audioUrl);
-          setSummary(cached.summary);
-          setPressed(true);
-          setLoading(false);
-          setShowSuccess(true);
-          setTimeout(() => setShowSuccess(false), 5000);
-          return;
+      if (!forceNew) {
+        const query = new URLSearchParams({ prompt, firebaseId }).toString();
+        const getRes = await fetch(
+          `https://studypod-nvau.onrender.com/mongo/audio-file-by-keywords?${query}`
+        );
+        if (getRes.ok) {
+          const cached = await getRes.json();
+          if (cached.firebaseId !== firebaseId) {
+            setTitle(cached.title);
+            setUrl(cached.audioUrl);
+            setSummary(cached.summary);
+            setPressed(true);
+            setShowSuccess(true);
+            setIsCached(true);
+            setLoading(false);
+            setTimeout(() => setShowSuccess(false), 5000);
+            return;
+          }
         }
-        // If it's the user's own podcast, continue to generate a new one
       }
 
-      // fallback to POST generate
+      // fallback or forced: generate new
       const response = await fetch(
         'https://studypod-nvau.onrender.com/generate-podcast',
         {
@@ -82,18 +77,15 @@ const Index: React.FC = () => {
           }),
         }
       );
-      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
       const data = await response.json();
       setTitle(data.title);
       setUrl(data.audioUrl);
       setSummary(data.summary);
       setPressed(true);
       setShowSuccess(true);
-      // Hide success message after 3 seconds
       setTimeout(() => setShowSuccess(false), 5000);
     } catch (error) {
       console.error('Error generating content:', error);
@@ -139,16 +131,18 @@ const Index: React.FC = () => {
               />
               <TouchableOpacity 
                 style={[styles.button, loading && styles.buttonDisabled]} 
-                onPress={handleGenerate}
+                onPress={() => handleGenerate(false)}
                 disabled={loading}
               >
                 {loading ? (
                   <View style={styles.loadingContainer}>
                     <ActivityIndicator size="small" color="#FFFFFF" />
-                    <Text style={[styles.buttonText, styles.loadingText]}>Generating Podcast...</Text>
+                    <Text style={[styles.buttonText, styles.loadingText]}>
+                      Generating Podcast...
+                    </Text>
                   </View>
                 ) : (
-                  <Text style={styles.buttonText}>Generate Podcast</Text>
+                  <Text style={styles.buttonText}>Create a Podcast</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -158,8 +152,25 @@ const Index: React.FC = () => {
                 <ActivityIndicator size="large" color="#5865F2" />
               ) : (
                 <>
+                  {isCached && (
+                    <>
+                      <Text style={styles.cachedLabel}>
+                        Unhappy With Your Podcast?
+                      </Text>
+                      <TouchableOpacity
+                        style={[styles.button, { marginBottom: 20 }]}
+                        onPress={() => handleGenerate(true)}
+                        disabled={loading}
+                      >
+                        <Text style={styles.buttonText}>
+                          Generate a Fresh One!
+                        </Text>
+                      </TouchableOpacity>
+                    </>
+                  )}
+
                   {summary && (
-                    <Text style={styles.resultText}>{summary}</Text>  // ← show summary
+                    <Text style={styles.resultText}>{summary}</Text>
                   )}
                   {url && title && (
                     <PodcastPlayer s3Url={url} isExpanded={true} />
@@ -169,12 +180,13 @@ const Index: React.FC = () => {
                     onPress={() => {
                       setPressed(false);
                       setPrompt('');
-                      setSummary(null);    // ← reset summary
+                      setSummary(null);
                       setUrl(null);
                       setTitle(null);
+                      setIsCached(false);
                     }}
                   >
-                    <Text style={styles.buttonText}>Generate a New Podcast</Text>
+                    <Text style={styles.buttonText}>New Idea?</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -236,19 +248,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  resultContainer: {
-    width: '100%',
-    maxWidth: 500,
-    padding: 20,
-    backgroundColor: '#2C2F33',
-    borderRadius: 8,
-  },
-  resultText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 16,
-  },
   buttonDisabled: {
     backgroundColor: '#4E5D94',
     opacity: 0.8,
@@ -262,21 +261,18 @@ const styles = StyleSheet.create({
   loadingText: {
     marginLeft: 8,
   },
-  loadingStateContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  resultContainer: {
+    width: '100%',
+    maxWidth: 500,
     padding: 20,
+    backgroundColor: '#2C2F33',
+    borderRadius: 8,
   },
-  loadingStateText: {
+  resultText: {
     color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  loadingStateSubtext: {
-    color: '#B9BBBE',
-    fontSize: 14,
+    fontSize: 16,
+    lineHeight: 24,
+    marginBottom: 16,
   },
   successContainer: {
     position: 'absolute',
@@ -288,10 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     zIndex: 1000,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -300,6 +293,12 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
+  },
+  cachedLabel: {
+    color: '#B9BBBE',
+    fontSize: 14,
+    marginBottom: 10,
     textAlign: 'center',
   },
 });
