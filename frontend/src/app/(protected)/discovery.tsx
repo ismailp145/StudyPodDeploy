@@ -17,7 +17,6 @@ import axios from 'axios';
 import { AuthContext } from '@/src/utils/authContext';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// Props expected by PodcastCard
 interface PodcastData {
   id: string;
   title: string;
@@ -25,7 +24,6 @@ interface PodcastData {
   audioUrl: string;
 }
 
-// Internal shapes
 interface AudioFileResponse {
   id: string;
   url: string;
@@ -40,7 +38,7 @@ interface UserResponse {
   user: {
     id: string;
     interests: string[];
-    Audios: string[];  // Array of audio IDs created by the user
+    Audios: string[];
   };
 }
 
@@ -74,24 +72,19 @@ export default function Discovery() {
       axios.get<UserResponse>(`${API_BASE_URL}/user/${firebaseId}`),
     ]);
 
-    // Convert all keywords to lowercase for case-insensitive matching
     const keywords = new Set<string>();
     const userCreatedAudioIds = new Set(userRes.data.user.Audios);
     
-    // Add keywords from user's listened podcasts (converted to lowercase)
     userAudioRes.data
       .filter(entry => entry.user.firebaseId === firebaseId)
       .forEach(entry =>
         entry.audioFile.summary?.keywords.forEach(k => keywords.add(k.toLowerCase()))
       );
 
-    // Add user's saved interests (converted to lowercase)
     userRes.data.user.interests.forEach(interest => keywords.add(interest.toLowerCase()));
 
     const matched = audioRes.data.filter(
       file => 
-        // Match keywords but exclude user-created podcasts
-        // Convert podcast keywords to lowercase for case-insensitive matching
         file.summary?.keywords.some(k => keywords.has(k.toLowerCase())) && 
         !userCreatedAudioIds.has(file.id)
     );
@@ -123,7 +116,6 @@ export default function Discovery() {
     }
   }, [firebaseId, fetchInitial, fetchDiscovery]);
 
-  // Refresh every time this screen gains focus
   useFocusEffect(
     useCallback(() => {
       if (!firebaseId) {
