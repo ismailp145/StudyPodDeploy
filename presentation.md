@@ -13,11 +13,6 @@
   * **Backend** (Node + Express, Prisma + MongoDB)
   * **AI services** Google Gemini 2.0-Flash (content) & PlayHT (speech)
   * **Storage/Delivery** AWS S3 for audio, Firebase for social auth, MongoDB
-* **Roles**
-
-  * Ismail – Auth flow, keyword parser, playlist UI
-  * Fahad – Interest model, audio-quality selection, player controls
-  * Yousef – Podcast generation pipeline, DB integration, S3 ops
 
 ---
 
@@ -44,9 +39,16 @@
 ## 3  Lessons Learned & Future Work  (\~1 min)  — **All**
 
 * **Tech we mastered:**
-  * Server-side streaming with Node & SSE
-  * winkNLP custom pipeline for lightweight NLP on device
+
+  * Prisma ORM for MongoDB
+  * Server-side streaming with Node & Server Side Events (SSE)
   * PlayHT async TTS web-hooks & retry logic
+  * Google Gemini 2.0-Flash for podcast generation
+  * PlayHT for audio synthesis
+  * Firebase Auth for social login
+  * AWS S3 for audio storage
+  * Expo Router for navigation
+
 * **If we had more time:**
 
   1. **Smart caching** – run PlayHT **after** checking DB to save credits (current TODO)
