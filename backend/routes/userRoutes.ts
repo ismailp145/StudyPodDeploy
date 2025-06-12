@@ -260,7 +260,7 @@ router.delete('/:firebaseId/playlist/:audioId', async (req: Request, res: Respon
     });
 
     if (!user) {
-      res.status(404).json({ error: 'User not found' });
+      res.status(409).json({ error: 'User not found' });
       return;
     }
 
@@ -273,7 +273,7 @@ router.delete('/:firebaseId/playlist/:audioId', async (req: Request, res: Respon
     });
 
     if (!playlistItem) {
-      res.status(404).json({ error: 'Audio not found in playlist' });
+      res.status(409).json({ error: 'Audio not found in playlist' });
       return;
     }
 

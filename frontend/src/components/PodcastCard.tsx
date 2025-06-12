@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import PodcastPlayer from './PodcastPlayer';
+import axios from 'axios';
 
 
 interface PodcastProps {
@@ -10,30 +11,23 @@ interface PodcastProps {
   summary: string;
   audioUrl: string;
   deleteButton?: boolean;
-  onDelete?: (isPressed: boolean) => void;
-  onDeleteCancel?: () => void;
+  firebaseId: string;
+
 }
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32; // Full width with padding on sides
 
-const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteButton = false, onDelete, onDeleteCancel }) => {
+const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteButton = false, firebaseId  }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
+   
+  const handleDelete = async () => {
 
-  const handleDelete = () => {
-    const newPressedState = true;
-    setIsPressed(newPressedState);
-    if (onDelete) {
-      onDelete(newPressedState);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    const newPressedState = false;
-    setIsPressed(newPressedState);
-    if (onDeleteCancel) {
-      onDeleteCancel();
+    const audioId = id.split('-')[1];
+    try {
+      await axios.delete(`https://studypod-nvau.onrender.com/user/${firebaseId}/playlist/${audioId}`);
+    } catch (error) {
+      console.error('Error deleting podcast:', error);
     }
   };
 

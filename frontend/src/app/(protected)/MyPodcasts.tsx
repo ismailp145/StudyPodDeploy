@@ -49,15 +49,6 @@ interface PodcastItem {
   audioUrl: string;
 }
 
-interface PodcastProps {
-  id: string;
-  title: string;
-  summary: string;
-  audioUrl: string;
-  deleteButton: boolean;
-  onDelete?: (isPressed: boolean) => void;
-  onDeleteCancel?: () => void;
-}
 
 const MyPodcasts: React.FC = () => {
   const { firebaseId } = useContext(AuthContext);
@@ -123,51 +114,6 @@ const MyPodcasts: React.FC = () => {
     fetchUserPodcasts();
   };
 
-  const handleDelete = (isPressed: boolean, item: PodcastItem) => {
-    if (isPressed) {
-      Alert.alert(
-        "Delete Podcast",
-        "Are you sure you want to delete this podcast?",
-        [
-          {
-            text: "Cancel",
-            style: "cancel",
-            onPress: () => {
-              // Reset the pressed state in the child component
-              // You might want to add a prop for this
-              handleDeleteCancel();
-            }
-          },
-          {
-            text: "Delete",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                // Extract audioId from the uniqueId (format: "entryId-audioFileId")
-                const audioId = item.id.split('-')[1];
-                
-                // Call delete API
-                await axios.delete(
-                  `https://studypod-nvau.onrender.com/mongo/${firebaseId}/playlist/${audioId}`
-                );
-
-                // Update local state by removing the deleted item
-                setItems(prevItems => prevItems.filter(podcast => podcast.id !== item.id));
-              } catch (err) {
-                console.error('Error deleting podcast:', err);
-                Alert.alert('Error', 'Failed to delete podcast. Please try again.');
-              }
-            }
-          }
-        ]
-      );
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    // Reset the pressed state in the child component
-    // You'll need to implement this in the PodcastCard component
-  };
 
   // Filtered podcasts based on search query
   const filteredPodcasts = items.filter(podcast =>
@@ -253,8 +199,7 @@ const MyPodcasts: React.FC = () => {
               summary={item.summary}
               audioUrl={item.audioUrl}
               deleteButton={true}
-              onDelete={(isPressed) => handleDelete(isPressed, item)}
-              onDeleteCancel={handleDeleteCancel}
+              firebaseId={firebaseId ?? ''}
             />
           </View>
         )}
@@ -347,6 +292,16 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     marginTop: 12,
+  },
+  podcastContainer: {
+    // flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    position: 'relative',
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
   },
 });
 
