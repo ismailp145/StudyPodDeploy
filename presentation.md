@@ -103,7 +103,7 @@ The podcast is then added to the database (Yousef)
 The podcast is shown in the user's library (Yousef)
 
 Discovery Page
-How the discovery page is populated.(Yousef)
+How the discovery page is populated.(Fahad)
 
 S3 Service (Fahad)
 
