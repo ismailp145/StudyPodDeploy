@@ -65,13 +65,19 @@
 
 Presentation Outline
 
+Fahad explains how s3 and prisma are set up
+
 User logs in - Ismail via Firebase (maybe social)
 
 User interest form - Fahad
-    Explain end to end so the interests are saved via usser field
+    Explain end to end so the interests are saved via user field
     discovery page uses interest form to populate from db if exists
 
 Sends to home page
+
+Yousef explains how the search and generate work with Gemeni and play ht and Mongo 
+
+^Demo
 
 User submits prompt and keyword catches (ismail)
     ismail explain keyword algo and then what happens if not found
@@ -79,7 +85,7 @@ User submits prompt and keyword catches (ismail)
     but if the podcast is already in the users audio files, then it goes to the next one
 
 Test case (user recieves audio they do not like or is not relevent because
-keyword parser is not able to parse prompt)
+keyword parser is not able to parse prompt) (Yousef)
 
 Then press button to make a post request and skips keyboard validation
 
@@ -103,17 +109,24 @@ Generate Podcast Flow -
 
 The podcast is returned
 
-Podcast audio player just points to s3 (ismail)
-Podcast controls (Req 5) (Fahad)
+How the playerworks -
+ Podcast audio player just points to s3 (ismail)
+ Podcast controls (Req 5) (Fahad)
 
-The podcast is then added to the database (Yousef)
-The podcast is shown in the user's library (Yousef)
 
 Discovery Page
 How the discovery page is populated.(Fahad)
 
-S3 Service (Fahad)
+MyPodcast Page
+ and backend mongo calls (Yousef)
+ Delete Funcitonality (Ismail)
+
+UI (Fahad)
+ Discord inspiration
+
 
 **Improvment**
-We should have used a relational db instead of mongo db, since we actually used
-relations more than not to connect our data.
+ We should have used a relational db instead of mongo db, since we actually used
+relations more than not to connect our data. (Ismail)
+ Keyword parser not in the middle of the api call (in between gemini and playht)
+ UserId is stored in authcontext and thats how we keep user state amoung front end pages. Thats an issue becasue its a security concern
