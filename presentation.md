@@ -23,8 +23,10 @@
 | Step  | Demo Action & Speaker                                         | Behind-the-Scenes Technical Highlights                                                                                                      |
 | ----- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **1** | **Log In (Ismail)** – Firebase auth                 | Firebase Auth SDK with email/password |
-| **2** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |\
-         
+| **2** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |
+| **10** | **How search adn generate works  (Yousef)**              | Backend checks user’s history → serves next best match (complexity: deterministic conflict resolution)                                      |
+
+        
 | **3** | **Discovery Page (Fahad)**                                    | Server joins `audioFiles` + `summary.keywords` against interests; lazy-loads waveform thumbnails                                            |
          Talk about searching and generating podcast (Yousef) 
 | **4** | **Custom Prompt (Ismail)** – “Explain CRISPR in simple terms” | ⚙️ **Keyword Parser** (winkNLP) extracts nouns → fast DB lookup; if hit, we stream existing audio                                           |
