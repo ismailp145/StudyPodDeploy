@@ -45,9 +45,10 @@
   * PlayHT async TTS web-hooks & retry logic
   * Google Gemini 2.0-Flash for podcast generation
   * PlayHT for audio synthesis
-  * Firebase Auth for social login
+  * Firebase Authentication
   * AWS S3 for audio storage
-  * Expo Router for navigation
+  * Expo Router and File Based Routing
+  * Git and Github
 
 * **If we had more time:**
 
