@@ -22,7 +22,6 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Stop playback when component unmounts or card is collapsed
   useEffect(() => {
     if (!isExpanded && sound) {
       const stopPlayback = async () => {
@@ -37,7 +36,6 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
     }
   }, [isExpanded, sound]);
 
-  // Cleanup when component unmounts
   useEffect(() => {
     return () => {
       if (sound) {
@@ -54,7 +52,6 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
     };
   }, [sound]);
 
-  // Initialize audio
   useEffect(() => {
     const loadAudio = async () => {
       try {
@@ -83,7 +80,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
     }
   };
 
-  // Update playback speed
+  
   useEffect(() => {
     const updatePlaybackSpeed = async () => {
       try {
@@ -233,7 +230,6 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
           </TouchableOpacity>
         </View>
 
-        {/* Playback Speed Modal */}
         <Modal
           visible={showSpeedModal}
           transparent={true}
