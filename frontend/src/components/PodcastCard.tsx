@@ -1,20 +1,48 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import PodcastPlayer from './PodcastPlayer';
+import axios from 'axios';
+import { AuthContext } from '../utils/authContext';
+
 
 interface PodcastProps {
   id: string;
   title: string;
   summary: string;
   audioUrl: string;
+  deleteButton?: boolean;
+
+
 }
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32; // Full width with padding on sides
 
-const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl }) => {
+const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteButton = false  }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { firebaseId } = useContext(AuthContext); 
+
+  const handleDelete = async () => {
+    if (!firebaseId) {
+       Alert.alert('Not signed in');
+       return;
+      }
+    const audioId = id.substring(id.indexOf('-') + 1);
+    
+    try {
+      await axios.delete(`https://studypod-nvau.onrender.com/user/${firebaseId}/playlist/${audioId}`);
+    } catch (error) {
+      console.error('Error deleting podcast:', error);
+        console.log(audioId);
+        console.log(firebaseId);
+
+    }
+  };
+
+  if (!firebaseId) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
@@ -28,6 +56,11 @@ const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl }) => {
           <Text style={styles.title} numberOfLines={2}>
             {title}
           </Text>
+          {deleteButton && (
+            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+              <MaterialIcons name="delete" size={24} color="#ED4245" />
+            </TouchableOpacity>
+          )}
         </View>
 
         <Text style={styles.summary} numberOfLines={isExpanded ? undefined : 2}>
@@ -91,6 +124,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 'auto',
     paddingTop: 8,
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
   },
 });
 

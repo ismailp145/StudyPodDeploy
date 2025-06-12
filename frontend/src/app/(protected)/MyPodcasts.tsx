@@ -9,6 +9,8 @@ import {
   StatusBar,
   Platform,
   SafeAreaView,
+  Alert,
+  TouchableOpacity,
   TextInput,
 } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
@@ -16,6 +18,7 @@ import Podcast from '@/src/components/PodcastCard';
 import { AuthContext } from '@/src/utils/authContext';
 import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MaterialIcons } from '@expo/vector-icons';
 
 const S3_BASE_URL = 'https://team5-study-pod-s3-bucket.s3.us-east-2.amazonaws.com';
 
@@ -46,6 +49,7 @@ interface PodcastItem {
   audioUrl: string;
 }
 
+
 const MyPodcasts: React.FC = () => {
   const { firebaseId } = useContext(AuthContext);
   const isFocused = useIsFocused();
@@ -54,6 +58,7 @@ const MyPodcasts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchUserPodcasts = async () => {
@@ -96,6 +101,7 @@ const MyPodcasts: React.FC = () => {
     }
   };
 
+
   useEffect(() => {
     if (isFocused && firebaseId) {
       setLoading(true);
@@ -107,6 +113,7 @@ const MyPodcasts: React.FC = () => {
     setRefreshing(true);
     fetchUserPodcasts();
   };
+
 
   // Filtered podcasts based on search query
   const filteredPodcasts = items.filter(podcast =>
@@ -185,12 +192,15 @@ const MyPodcasts: React.FC = () => {
           />
         }
         renderItem={({ item }) => (
-          <Podcast
-            id={item.id}
-            title={item.title}
-            summary={item.summary}
-            audioUrl={item.audioUrl}
-          />
+          <View style={styles.podcastContainer}>
+            <Podcast
+              id={item.id}
+              title={item.title}
+              summary={item.summary}
+              audioUrl={item.audioUrl}
+              deleteButton={true}
+            />
+          </View>
         )}
         ListEmptyComponent={!loading && !error && items.length > 0 && filteredPodcasts.length === 0 ? (
           <View style={styles.centerContent}>
@@ -280,8 +290,17 @@ const styles = StyleSheet.create({
     marginRight: 16,
     color: '#FFFFFF',
     fontSize: 16,
-    borderColor: '#40444B',
-    borderWidth: 1,
+    marginTop: 12,
+  },
+  podcastContainer: {
+    // flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+    position: 'relative',
+  },
+  deleteButton: {
+    padding: 8,
+    marginLeft: 8,
   },
 });
 

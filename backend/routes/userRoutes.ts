@@ -251,4 +251,54 @@ router.post('/:firebaseId/playlist', async (req: Request, res: Response): Promis
   }
 });
 
+router.delete('/:firebaseId/playlist/:audioId', async (req: Request, res: Response): Promise<void> => {
+  const { firebaseId, audioId } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { firebaseId }
+    });
+
+    if (!user) {
+      res.status(409).json({ error: 'User not found' });
+      return;
+    }
+
+    // Find the playlist item first
+    const playlistItem = await prisma.userAudioFile.findFirst({
+      where: {
+        userId: user.id,
+        audioId: audioId
+      }
+    });
+
+    if (!playlistItem) {
+      res.status(409).json({ error: 'Audio not found in playlist' });
+      return;
+    }
+
+    // Delete the playlist item using its ID
+    await prisma.userAudioFile.delete({
+      where: {
+        id: playlistItem.id
+      }
+    });
+
+    // Update the user's Audios array
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        Audios: {
+          set: user.Audios.filter(id => id !== audioId)
+        }
+      }
+    });
+
+    res.json({ message: 'Audio removed from playlist' });
+  } catch (error) {
+    console.error('Error removing from playlist:', error);
+    res.status(500).json({ error: 'Failed to remove from playlist' });
+  }
+});
+
 export default router;
