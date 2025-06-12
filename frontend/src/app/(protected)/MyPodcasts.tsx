@@ -90,7 +90,7 @@ const MyPodcasts: React.FC = () => {
       setItems(podcasts);
     } catch (err) {
       console.error(err);
-      setError("Couldn't load your podcasts");
+      setError("Couldn't load your playlist...");
     } finally {
       setLoading(false);
       setRefreshing(false);
