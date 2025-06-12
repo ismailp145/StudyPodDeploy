@@ -38,8 +38,7 @@ router.get('/audio-files', async (_req: Request, res: Response) => {
         summary: true,
         savedBy: {
           include: { user: true }
-        },
-        AudioFileKeyword: true
+        }
       }
     });
     res.json(audioFiles);
