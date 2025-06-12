@@ -146,6 +146,7 @@ export default function Discovery() {
     return (
       <SafeAreaView style={styles.centered}>
         <ActivityIndicator size="large" color="#5865F2" />
+        <Text style={styles.loadingText}>Loading your explore feed...</Text>
       </SafeAreaView>
     );
   }
@@ -279,4 +280,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#23272A',
   },
   errorText: { color: '#ED4245', fontSize: 16 },
+  loadingText: {
+    color: '#B9BBBE',
+    marginTop: 10,
+    fontSize: 16,
+  },
 });
