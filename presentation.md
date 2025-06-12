@@ -2,7 +2,7 @@
 
 ---
 
-## 1  Introduction & Problem Statement  (\~2 min)  — **Ismail**
+## 1  Introduction & Problem Statement  (\~2 min)  — **All**
 
 * **Hook** – Students waste time skimming articles when they could be listening on-the-go.
 * **Problem** – Existing podcast apps don’t generate *personal* audio from arbitrary study material or adapt to users’ changing interests.
