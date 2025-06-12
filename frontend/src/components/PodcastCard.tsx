@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import PodcastPlayer from './PodcastPlayer';
 import axios from 'axios';
+import { AuthContext } from '../utils/authContext';
 
 
 interface PodcastProps {
@@ -11,25 +12,37 @@ interface PodcastProps {
   summary: string;
   audioUrl: string;
   deleteButton?: boolean;
-  firebaseId: string;
+
 
 }
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = width - 32; // Full width with padding on sides
 
-const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteButton = false, firebaseId  }) => {
+const Podcast: React.FC<PodcastProps> = ({ id, title, summary, audioUrl, deleteButton = false  }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-   
-  const handleDelete = async () => {
+  const { firebaseId } = useContext(AuthContext); 
 
-    const audioId = id.split('-')[1];
+  const handleDelete = async () => {
+    if (!firebaseId) {
+       Alert.alert('Not signed in');
+       return;
+      }
+    const audioId = id.substring(id.indexOf('-') + 1);
+    
     try {
       await axios.delete(`https://studypod-nvau.onrender.com/user/${firebaseId}/playlist/${audioId}`);
     } catch (error) {
       console.error('Error deleting podcast:', error);
+        console.log(audioId);
+        console.log(firebaseId);
+
     }
   };
+
+  if (!firebaseId) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>

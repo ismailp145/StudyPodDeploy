@@ -199,7 +199,6 @@ const MyPodcasts: React.FC = () => {
               summary={item.summary}
               audioUrl={item.audioUrl}
               deleteButton={true}
-              firebaseId={firebaseId ?? ''}
             />
           </View>
         )}

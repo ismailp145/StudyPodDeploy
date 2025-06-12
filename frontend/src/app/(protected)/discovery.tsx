@@ -185,7 +185,6 @@ export default function Discovery() {
                   title={item.title}
                   summary={item.summary}
                   audioUrl={item.audioUrl}
-                  firebaseId={firebaseId ?? ''}
                 />
               </View>
             )}
@@ -206,7 +205,6 @@ export default function Discovery() {
                   title={item.title}
                   summary={item.summary}
                   audioUrl={item.audioUrl}
-                  firebaseId={firebaseId ?? ''}
                 />
               </View>
             )}
