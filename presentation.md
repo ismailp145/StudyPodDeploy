@@ -27,7 +27,7 @@
 
 | Step  | Demo Action & Speaker                                         | Behind-the-Scenes Technical Highlights                                                                                                      |
 | ----- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | **Log In (Ismail)** – Google/Firebase one-tap                 | Secure OAuth tokens stored with Expo SecureStore → JWT to backend                                                                           |
+| **1** | **Log In (Ismail)** – Firebase auth                 | Firebase Auth SDK with email/password |
 | **2** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |
 | **3** | **Discovery Page (Fahad)**                                    | Server joins `audioFiles` + `summary.keywords` against interests; lazy-loads waveform thumbnails                                            |
 | **4** | **Custom Prompt (Ismail)** – “Explain CRISPR in simple terms” | ⚙️ **Keyword Parser** (winkNLP) extracts nouns → fast DB lookup; if hit, we stream existing audio                                           |
@@ -51,8 +51,9 @@
 
   1. **Smart caching** – run PlayHT **after** checking DB to save credits (current TODO)
   2. **Vector search** with Pinecone for semantic matches instead of keyword hits
-  3. **Collaborative playlists** and shareable episode links
-  4. **Offline downloads** via Expo Audio & background sync
+  3. **Relational DB** instead of a non-relational database
+  4. **Collaborative playlists** and shareable episode links
+  5. **Offline downloads** via Expo Audio & background sync
 
 > **Q-Ready** – Every member reviewed all service endpoints, schema files, and CI scripts, so feel free to quiz us on any layer of the stack.
 
