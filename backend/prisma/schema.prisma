@@ -26,7 +26,6 @@ model AudioFile {
   uploadDate       DateTime           @default(now()) // Upload timestamp
   summary          PodcastSummary?    @relation("AudioToSummary") // 1:1 relation back to summary
   savedBy          UserAudioFile[] // All users who have saved this audio
-  AudioFileKeyword AudioFileKeyword[]
 }
 
 model PodcastSummary {
@@ -46,11 +45,4 @@ model UserAudioFile {
   user      User      @relation(fields: [userId], references: [id])
   audioFile AudioFile @relation(fields: [audioId], references: [id])
   addedAt   DateTime  @default(now()) // When user saved the audio
-}
-
-model AudioFileKeyword {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  keyword     String
-  audioFile   AudioFile @relation(fields: [audioFileId], references: [id])
-  audioFileId String    @db.ObjectId
 }
