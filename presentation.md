@@ -23,16 +23,17 @@
 | Step  | Demo Action & Speaker                                         | Behind-the-Scenes Technical Highlights                                                                                                      |
 | ----- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **1** | **Talk about S3 and Prisma set up (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                 
-| **1** | **Log In (Ismail)** – Firebase auth                 | Firebase Auth SDK with email/password |
-| **2** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |
-| **10** | **How search adn generate works  (Yousef)**              | Backend checks user’s history → serves next best match (complexity: deterministic conflict resolution)                                          |
-| **3** | **Discovery Page (Fahad)**                                    | Server joins `audioFiles` + `summary.keywords` against interests; lazy-loads waveform thumbnails                                            |
-| **4** | **Custom Prompt (Ismail)** – “Explain CRISPR in simple terms” | ⚙️ **Keyword Parser** (winkNLP) extracts nouns → fast DB lookup; if hit, we stream existing audio                                           |
-| **5** | **Fallback Generation (Yousef)** – Tap *Generate*             | ① Gemini returns `{title, content, summary, keywords}` ② Text cached, keywords re-indexed ③ PlayHT converts to realistic voice (selected ↓) |
-| **6** | **Audio Quality Choice (Fahad)** – Standard vs HQ voice       | Passes `voiceId` & `format` in PlayHT request; \~15 s synthesis; progress bar via SSE                                                       |
-| **7** | **Playback (Ismail)** – Native player UI                      | Audio URL is a signed S3 link; no downloads → lower data use; background playback supported                                                 |
-| **8** | **Save & My Playlist (Ismail)**                               | Creates `userAudioFiles` doc → invokes optimistic UI update; swipe-to-delete triggers HTTP `DELETE` (demo OK & error states)                |
-| **9** | **Edge Case Demo (Yousef)** – Duplicate keyword               | Backend checks user’s history → serves next best match (complexity: deterministic conflict resolution)                                      |
+| **2** | **Log In (Ismail)** – Firebase auth                 | Firebase Auth SDK with email/password |
+| **3** | **Set Interests (Fahad)** – Fill quick tag form               | Interests persisted on `users` collection; discovery queries pre-filtered by Mongo `$text` search                                           |
+| **4** | **How search and generate works  (Yousef)**              | Backend checks user’s history → serves next best match (complexity: deterministic conflict resolution)                                          |
+| **5** | **Custom Prompt (Ismail)** – “Explain CRISPR in simple terms” | ⚙️ **Keyword Parser** (winkNLP) extracts nouns → fast DB lookup; if hit, we stream existing audio                                           |
+| **6** | **Fallback Generation (Yousef)** – Tap *Generate*             | ① Gemini returns `{title, content, summary, keywords}` ② Text cached, keywords re-indexed ③ PlayHT converts to realistic voice (selected ↓) |
+| **7** | **Audio Quality Choice (Fahad)** – Standard vs HQ voice       | Passes `voiceId` & `format` in PlayHT request; \~15 s synthesis; progress bar via SSE                                                       |
+| **8** | **Playback (Ismail)** – Native player UI                      | Audio URL is a signed S3 link; no downloads → lower data use; background playback supported                                                 |
+| **9** | **Discovery Page (Fahad)**                                    | Server joins `audioFiles` + `summary.keywords` against interests; lazy-loads waveform thumbnails                                            |
+| **10** | **Save & My Playlist (Yousef)**                               | Creates `userAudioFiles` doc → invokes optimistic UI update; swipe-to-delete triggers HTTP `DELETE` (demo OK & error states)                |
+| **11** | **Edge Case Demo (Ismail)** – Duplicate keyword               | Backend checks user’s history → serves next best match (complexity: deterministic conflict resolution)                                      |
+
 
 *Throughout the demo we’ll surface debug overlays (Redux dev-tools & Prisma logs) to prove the pipeline is real-time and fault-tolerant.*
 
