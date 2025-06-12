@@ -28,7 +28,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
           await sound.pauseAsync();
           setIsPlaying(false);
         } catch (error) {
-          console.error('Error stopping playback:', error);
+          console.log('Error stopping playback:', error);
         }
       };
       stopPlayback();
@@ -43,7 +43,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
             await sound.stopAsync();
             await sound.unloadAsync();
           } catch (error) {
-            console.error('Error cleaning up audio:', error);
+            console.log('Error cleaning up audio:', error);
           }
         };
         cleanup();
@@ -62,7 +62,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
         );
         setSound(newSound);
       } catch (error) {
-        console.error('Error loading audio:', error);
+        console.log('Error loading audio:', error);
       } finally {
         setIsLoading(false);
       }
@@ -87,7 +87,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
           await sound.setRateAsync(playbackSpeed, true);
         }
       } catch (error) {
-        console.error('Error setting playback speed:', error);
+        console.log('Error setting playback speed:', error);
       }
     };
 
@@ -104,7 +104,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
         await sound.playAsync();
       }
     } catch (err) {
-      console.error('Error playing/pausing:', err);
+      console.log('Error playing/pausing:', err);
     }
   };
 
@@ -125,7 +125,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
         await sound.setPositionAsync(newTime * 1000);
       }
     } catch (err) {
-      console.error('Error skipping:', err);
+      console.log('Error skipping:', err);
     }
   };
 
