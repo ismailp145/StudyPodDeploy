@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import PodcastPlayer from '../../components/PodcastPlayer';
 import VoiceSelector from '../../components/VoiceSelector';
 import { AuthContext } from '@/src/utils/authContext';
@@ -28,8 +29,10 @@ const Index: React.FC = () => {
   const [title, setTitle] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showFreshSuccess, setShowFreshSuccess] = useState(false);
 
   const [isCached, setIsCached] = useState(false);
+  const [isGeneratingFresh, setIsGeneratingFresh] = useState(false);
 
   const { firebaseId } = useContext(AuthContext);
 
@@ -39,8 +42,12 @@ const Index: React.FC = () => {
 
   const handleGenerate = async (forceNew: boolean = false) => {
     if (!prompt.trim()) return;
-    setLoading(true);
-    setIsCached(false);
+    
+    if (forceNew) {
+      setIsGeneratingFresh(true);
+    } else {
+      setLoading(true);
+    }
 
     try {
       if (!forceNew) {
@@ -81,18 +88,34 @@ const Index: React.FC = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
+      
+      // Update podcast content
       setTitle(data.title);
       setUrl(data.audioUrl);
       setSummary(data.summary);
-      setPressed(true);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 5000);
+      
+      if (!forceNew) {
+        setPressed(true);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 5000);
+      } else {
+        setShowFreshSuccess(true);
+        setTimeout(() => setShowFreshSuccess(false), 5000);
+      }
     } catch (error) {
       console.error('Error generating content:', error);
       setSummary('Failed to generate summary. Please try again.');
-      setPressed(true);
+      if (!forceNew) {
+        setPressed(true);
+      }
     } finally {
-      setLoading(false);
+      if (forceNew) {
+        setTimeout(() => {
+          setIsGeneratingFresh(false);
+        }, 500);
+      } else {
+        setLoading(false);
+      }
     }
   };
 
@@ -108,10 +131,32 @@ const Index: React.FC = () => {
             <Text style={styles.successText}>Podcast saved to your playlist!</Text>
           </View>
         )}
+        {showFreshSuccess && (
+          <View style={styles.successContainer}>
+            <Text style={styles.successText}>New version of podcast generated!</Text>
+          </View>
+        )}
         <ScrollView
           contentContainerStyle={styles.contentContainer}
           keyboardShouldPersistTaps="handled"
         >
+          {pressed && (
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => {
+                setPressed(false);
+                setPrompt('');
+                setSummary(null);
+                setUrl(null);
+                setTitle(null);
+                setIsCached(false);
+              }}
+            >
+              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+              <Text style={styles.backButtonText}>Back</Text>
+            </TouchableOpacity>
+          )}
+
           <Text style={styles.title}>StudyPod</Text>
           <Text style={styles.subtitle}>Generate podcasts on any topic</Text>
 
@@ -152,42 +197,44 @@ const Index: React.FC = () => {
                 <ActivityIndicator size="large" color="#5865F2" />
               ) : (
                 <>
-                  {isCached && (
-                    <>
-                      <Text style={styles.cachedLabel}>
-                        Unhappy With Your Podcast?
-                      </Text>
-                      <TouchableOpacity
-                        style={[styles.button, { marginBottom: 20 }]}
-                        onPress={() => handleGenerate(true)}
-                        disabled={loading}
-                      >
-                        <Text style={styles.buttonText}>
-                          Generate a Fresh One!
-                        </Text>
-                      </TouchableOpacity>
-                    </>
-                  )}
-
                   {summary && (
                     <Text style={styles.resultText}>{summary}</Text>
                   )}
                   {url && title && (
                     <PodcastPlayer s3Url={url} isExpanded={true} />
                   )}
-                  <TouchableOpacity
-                    style={[styles.button, { marginTop: 20 }]}
-                    onPress={() => {
-                      setPressed(false);
-                      setPrompt('');
-                      setSummary(null);
-                      setUrl(null);
-                      setTitle(null);
-                      setIsCached(false);
-                    }}
-                  >
-                    <Text style={styles.buttonText}>New Idea?</Text>
-                  </TouchableOpacity>
+                  
+                  {isCached && (
+                    <View style={styles.freshGenerationContainer}>
+                      <Text style={styles.freshGenerationTitle}>
+                        Want a Different Podcast?
+                      </Text>
+                      <Text style={styles.freshGenerationDescription}>
+                        Generate a fresh podcast with new content. This may take a few minutes as we create unique content just for you.
+                      </Text>
+                      <TouchableOpacity
+                        style={[
+                          styles.button, 
+                          isGeneratingFresh && styles.buttonDisabled
+                        ]}
+                        onPress={() => handleGenerate(true)}
+                        disabled={isGeneratingFresh}
+                      >
+                        {isGeneratingFresh ? (
+                          <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                            <Text style={[styles.buttonText, styles.loadingText]}>
+                              Generating Podcast...
+                            </Text>
+                          </View>
+                        ) : (
+                          <Text style={styles.buttonText}>
+                            Regenerate
+                          </Text>
+                        )}
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </>
               )}
             </View>
@@ -295,10 +342,38 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  cachedLabel: {
+  backButton: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    zIndex: 10,
+  },
+  backButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    marginLeft: 4,
+  },
+  freshGenerationContainer: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: '#36393F',
+    borderRadius: 8,
+  },
+  freshGenerationTitle: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  freshGenerationDescription: {
     color: '#B9BBBE',
     fontSize: 14,
-    marginBottom: 10,
+    lineHeight: 20,
+    marginBottom: 16,
     textAlign: 'center',
   },
 });
