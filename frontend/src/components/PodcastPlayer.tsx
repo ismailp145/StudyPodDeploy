@@ -114,7 +114,7 @@ const PodcastPlayer = ({ s3Url, isExpanded }: PodcastPlayerProps) => {
         await sound.setPositionAsync(value * 1000);
       }
     } catch (err) {
-      console.error('Error seeking:', err);
+      console.log('Error seeking:', err);
     }
   };
 
