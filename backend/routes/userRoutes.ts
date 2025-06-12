@@ -4,7 +4,6 @@ import { PrismaClient, Prisma } from '../generated/prisma';
 const router: Router = express.Router();
 const prisma = new PrismaClient();
 
-// Get all users (might want to add auth middleware)
 router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await prisma.user.findMany({
@@ -26,7 +25,6 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// Create new user
 router.post('/', async (req: Request, res: Response): Promise<void> => {
   const { firebaseId, email } = req.body;
 
@@ -36,7 +34,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   }
 
   try {
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { firebaseId }
     });
@@ -46,7 +43,6 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Create new user
     const user = await prisma.user.create({
       data: { firebaseId, email },
       include: {
@@ -65,13 +61,11 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// Update existing user
 router.put('/:firebaseId', async (req: Request, res: Response): Promise<void> => {
   const { firebaseId } = req.params;
   const { email } = req.body;
 
   try {
-    // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { firebaseId }
     });
@@ -81,7 +75,6 @@ router.put('/:firebaseId', async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    // Update user
     const user = await prisma.user.update({
       where: { firebaseId },
       data: { email },
@@ -101,7 +94,6 @@ router.put('/:firebaseId', async (req: Request, res: Response): Promise<void> =>
   }
 });
 
-// Get user by Firebase ID
 router.get('/:firebaseId', async (req: Request, res: Response): Promise<void> => {
   const { firebaseId } = req.params;
 
@@ -129,7 +121,6 @@ router.get('/:firebaseId', async (req: Request, res: Response): Promise<void> =>
   }
 });
 
-// Delete user
 router.delete('/:firebaseId', async (req: Request, res: Response): Promise<void> => {
   const { firebaseId } = req.params;
 
@@ -148,7 +139,6 @@ router.delete('/:firebaseId', async (req: Request, res: Response): Promise<void>
   }
 });
 
-// Save user interests
 router.post('/interests/:firebaseId', async (req: Request, res: Response): Promise<void> => {
   const { firebaseId } = req.params;
   const { interests } = req.body;
@@ -159,7 +149,6 @@ router.post('/interests/:firebaseId', async (req: Request, res: Response): Promi
   }
 
   try {
-    // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: { firebaseId }
     });
@@ -169,7 +158,6 @@ router.post('/interests/:firebaseId', async (req: Request, res: Response): Promi
       return;
     }
 
-    // Update user interests
     const user = await prisma.user.update({
       where: { firebaseId },
       data: { interests },
@@ -189,7 +177,6 @@ router.post('/interests/:firebaseId', async (req: Request, res: Response): Promi
   }
 });
 
-// Add audio file to user's playlist
 router.post('/:firebaseId/playlist', async (req: Request, res: Response): Promise<void> => {
   const { firebaseId } = req.params;
   const { audioId } = req.body;
@@ -200,7 +187,6 @@ router.post('/:firebaseId/playlist', async (req: Request, res: Response): Promis
   }
 
   try {
-    // Check if user exists
     const user = await prisma.user.findUnique({
       where: { firebaseId }
     });
@@ -210,7 +196,6 @@ router.post('/:firebaseId/playlist', async (req: Request, res: Response): Promis
       return;
     }
 
-    // Check if audio file exists
     const audioFile = await prisma.audioFile.findUnique({
       where: { id: audioId }
     });
@@ -220,7 +205,6 @@ router.post('/:firebaseId/playlist', async (req: Request, res: Response): Promis
       return;
     }
 
-    // Check if user already has this audio file in their playlist
     const existingPlaylistItem = await prisma.userAudioFile.findFirst({
       where: {
         userId: user.id,
@@ -233,7 +217,6 @@ router.post('/:firebaseId/playlist', async (req: Request, res: Response): Promis
       return;
     }
 
-    // Add audio file to user's playlist
     const playlistItem = await prisma.userAudioFile.create({
       data: {
         userId: user.id,
@@ -264,7 +247,6 @@ router.delete('/:firebaseId/playlist/:audioId', async (req: Request, res: Respon
       return;
     }
 
-    // Find the playlist item first
     const playlistItem = await prisma.userAudioFile.findFirst({
       where: {
         userId: user.id,
@@ -277,14 +259,12 @@ router.delete('/:firebaseId/playlist/:audioId', async (req: Request, res: Respon
       return;
     }
 
-    // Delete the playlist item using its ID
     await prisma.userAudioFile.delete({
       where: {
         id: playlistItem.id
       }
     });
 
-    // Update the user's Audios array
     await prisma.user.update({
       where: { id: user.id },
       data: {
