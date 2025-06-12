@@ -1,3 +1,5 @@
+https://docs.google.com/document/d/1sOekWdQBlweIVi_8iPZ-w9Lun3CFiHvkeR8Bp7ByT5g/edit?usp=sharing
+
 ### StudyPod — Final Presentation Outline (8-10 min)
 
 ---
