@@ -1,0 +1,25 @@
+# Todo for Deployment
+
+- Frontend Hosted
+    - Apple Testflight
+    - Android Dev
+- Backend Hosted
+    - AWS / Render
+    - Serverless Function for Podcast Generation
+- Allow Document Upload
+- Allow web crawling / Article Reading
+- Speach Input
+- Make S3 Private  
+- Stripe Integration
+    - Scaling for PlayHT / Eleven Labs
+    - Cost benefit for the tiers
+- EAS Deployment
+- Audio Interruptions
+- JWT Auth / cut out Firebase
+- PostgreSQL instead of MongoDB
+- Plaintext Encryption
+- 10 minute audios
+- Free + Paid Tiers
+- Intelligent Personalized Podcast Audios
+- Load balancing for the backend
+- Optimize smart keyword searcher
